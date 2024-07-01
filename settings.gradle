@@ -1,0 +1,7 @@
+rootProject.name = 'java-aop'
+include 'aop'
+include 'app'
+include 'di'
+include 'jdbc'
+include 'mvc'
+include 'study'
