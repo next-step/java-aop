@@ -1,5 +1,6 @@
 package camp.nextstep.step1
 
+import camp.nextstep.aop.CglibAopProxy
 import camp.nextstep.aop.JdkDynamicAopProxy
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -29,6 +30,18 @@ class HelloTest : FunSpec({
 
             val actual = hello.sayHi("jin young")
             actual shouldBe "HI JIN YOUNG"
+        }
+    }
+
+    context("cglib") {
+        test("use CglibAopProxy") {
+            val cglibAopProxy = CglibAopProxy()
+            cglibAopProxy.addAdvice(UpperCaseMethodInterceptor())
+            cglibAopProxy.setTargetClass(HelloTarget::class.java)
+            val hello = cglibAopProxy.proxy as HelloTarget
+
+            val actual = hello.sayThankYou("jin young")
+            actual shouldBe "THANK YOU JIN YOUNG"
         }
     }
 })
