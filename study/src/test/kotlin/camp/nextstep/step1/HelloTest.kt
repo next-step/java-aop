@@ -8,8 +8,8 @@ import java.lang.reflect.Proxy
 
 class HelloTest : FunSpec({
 
-    context("sayHello") {
-        test("대문자로 변환하여 반환한다") {
+    context("java dynamic proxy") {
+        test("use JdkDynamicAopProxy") {
             val jdkDynamicAopProxy = JdkDynamicAopProxy()
             jdkDynamicAopProxy.setInterfaces(Hello::class.java)
             jdkDynamicAopProxy.addAdvice(UpperCaseInvocationHandler(HelloTarget()))
@@ -18,10 +18,8 @@ class HelloTest : FunSpec({
             val actual = hello.sayHello("jin young")
             actual shouldBe "HELLO JIN YOUNG"
         }
-    }
 
-    context("sayHi") {
-        test("대문자로 변환하여 반환한다") {
+        test("use Proxy") {
             val hello = Proxy.newProxyInstance(
                 Hello::class.java.classLoader,
                 arrayOf(Hello::class.java),
