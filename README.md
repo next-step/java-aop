@@ -57,3 +57,9 @@ cligb를 구현할 때 스샷을 참고해서 아래 VM 옵션을 활성화한�
 ![](docs/images/add-vm-options.png)
 
 ![](docs/images/input-options.png)
+
+## 1단계 - JDK Proxy와 CGLIB Proxy
+- java dynamic proxy
+  - 메소드의 반환값을 모두 대문자로 반환하도록 변환한다
+  - UpperCaseInvocationHandler
+    - running target으로 Hello 구현체를 받아 생성한다
