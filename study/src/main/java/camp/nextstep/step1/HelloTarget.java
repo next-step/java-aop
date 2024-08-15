@@ -12,4 +12,9 @@ class HelloTarget implements Hello {
     public String sayThankYou(String name) {
         return "Thank You " + name;
     }
+
+    @Override
+    public String pingPong(String name) {
+        return "Ping Pong " + name;
+    }
 }
