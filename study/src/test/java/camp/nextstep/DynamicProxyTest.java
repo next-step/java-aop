@@ -28,12 +28,14 @@ public class DynamicProxyTest {
         final String helloActual = hello.sayHello(name);
         final String hiActual = hello.sayHi(name);
         final String thankYouActual = hello.sayThankYou(name);
+        final String pingPongActual = hello.pingPong(name);
 
         // then
         assertAll(
                 () -> assertThat(helloActual).isEqualTo("HELLO NAME"),
                 () -> assertThat(hiActual).isEqualTo("HI NAME"),
-                () -> assertThat(thankYouActual).isEqualTo("THANK YOU NAME")
+                () -> assertThat(thankYouActual).isEqualTo("THANK YOU NAME"),
+                () -> assertThat(pingPongActual).isEqualTo("PING PONG NAME")
         );
     }
 }

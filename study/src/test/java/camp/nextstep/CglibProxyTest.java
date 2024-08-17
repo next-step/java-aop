@@ -25,12 +25,14 @@ public class CglibProxyTest {
         final String helloActual = helloTarget.sayHello(name);
         final String hiActual = helloTarget.sayHi(name);
         final String thankYouActual = helloTarget.sayThankYou(name);
+        final String pingPongActual = helloTarget.pingPong(name);
 
         // then
         assertAll(
                 () -> assertThat(helloActual).isEqualTo("HELLO NAME"),
                 () -> assertThat(hiActual).isEqualTo("HI NAME"),
-                () -> assertThat(thankYouActual).isEqualTo("THANK YOU NAME")
+                () -> assertThat(thankYouActual).isEqualTo("THANK YOU NAME"),
+                () -> assertThat(pingPongActual).isEqualTo("PING PONG NAME")
         );
     }
 }

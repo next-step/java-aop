@@ -18,6 +18,6 @@ public class HelloTarget implements Hello {
 
     @Override
     public String pingPong(final String name) {
-        return "pingPong " + name;
+        return "ping Pong " + name;
     }
 }
