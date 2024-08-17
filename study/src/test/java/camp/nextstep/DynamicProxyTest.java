@@ -38,4 +38,33 @@ public class DynamicProxyTest {
                 () -> assertThat(pingPongActual).isEqualTo("PING PONG NAME")
         );
     }
+
+    @DisplayName("인터페이스와 구현 클래스를 이용해 say 로 시작하는 메서드의 반환 값을 대문자로 변환 한다")
+    @Test
+    public void sayMethodToUpper() throws Exception {
+        // given
+        final HelloTarget helloTarget = new HelloTarget();
+
+        final Hello hello = (Hello) Proxy.
+                newProxyInstance(
+                        this.getClass().getClassLoader(),
+                        new Class[]{Hello.class},
+                        new UpperCaseInvocationHandler(helloTarget));
+
+        final String name = "name";
+
+        // when
+        final String helloActual = hello.sayHello(name);
+        final String hiActual = hello.sayHi(name);
+        final String thankYouActual = hello.sayThankYou(name);
+        final String pingPongActual = hello.pingPong(name);
+
+        // then
+        assertAll(
+                () -> assertThat(helloActual).isEqualTo("HELLO NAME"),
+                () -> assertThat(hiActual).isEqualTo("HI NAME"),
+                () -> assertThat(thankYouActual).isEqualTo("THANK YOU NAME"),
+                () -> assertThat(pingPongActual).isEqualTo("ping Pong name")
+        );
+    }
 }
