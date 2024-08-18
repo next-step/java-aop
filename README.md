@@ -59,5 +59,5 @@ cligb를 구현할 때 스샷을 참고해서 아래 VM 옵션을 활성화한�
 ![](docs/images/input-options.png)
 
 ### 🚀 1단계 - JDK Proxy와 CGLIB Proxy
-- [ ] : java dynamic proxy (메소드의 반환값을 모두 대문자로 반환하도록 변환한다)
+- [x] : java dynamic proxy (메소드의 반환값을 모두 대문자로 반환하도록 변환한다)
 - [ ] : cglib proxy (인터페이스를 사용하지 않고 구현체만으로 대문자를 반환하도록 변한한다)
