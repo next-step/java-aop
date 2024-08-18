@@ -73,6 +73,7 @@ cligb를 구현할 때 스샷을 참고해서 아래 VM 옵션을 활성화한�
 ## 2단계 - Proxy와 Bean 의존관계
 - ProxyBean
   - getObject에서 cblib을 통한 proxy 객체를 생성하여 반환한다
+  - 프록시빈의 타입을 반환한다
   - Enhancer에서 보유중인 Advisors를 돌면서 pointCut과 Advice를 callBack으로 지저안다
 - Aspect(Advisor)
   - PointCut과 Advice를 가진다

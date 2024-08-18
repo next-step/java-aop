@@ -14,13 +14,26 @@ class ProxyFactoryBeanTest {
                 method -> method.getName().startsWith("say"),
                 new UpperCaseAdvice()
         );
-        ProxyFactoryBean<Hello> bean = new ProxyFactoryBean<>(target, advisor);
+        ProxyFactoryBean<Hello> factoryBean = new ProxyFactoryBean<>(target, advisor);
 
-        Hello actual = bean.getObject();
+        Hello actual = factoryBean.getObject();
         assertAll(
                 () -> assertThat(actual.sayHello("jinyoung")).isEqualTo("SAY JINYOUNG"),
                 () -> assertThat(actual.pingPong("jinyoung")).isEqualTo("pingPong jinyoung")
         );
+    }
+
+    @Test
+    void 프록시빈의_타입을_반환한다() {
+        Target<Hello> target = new Target<>(Hello.class);
+        Advisor advisor = new Advisor(
+                method -> method.getName().startsWith("say"),
+                new UpperCaseAdvice()
+        );
+        ProxyFactoryBean<Hello> factoryBean = new ProxyFactoryBean<>(target, advisor);
+
+        Class<Hello> actual = factoryBean.getType();
+        assertThat(actual).isEqualTo(Hello.class);
     }
 
     public static class Hello {
