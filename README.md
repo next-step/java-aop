@@ -89,3 +89,6 @@ cligb를 구현할 때 스샷을 참고해서 아래 VM 옵션을 활성화한�
   - JoinPoint를 받아 구현내용을 invoke 처리한다
 - Target
   - 실행의 대상이 되는 target class 정보를 가진다
+
+- BeanFactory
+  - 빈 생성 시 FactoryBean인 경우 반환되는 프록시 빈으로 등록한다
