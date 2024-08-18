@@ -77,6 +77,8 @@ cligb를 구현할 때 스샷을 참고해서 아래 VM 옵션을 활성화한�
 - Aspect(Advisor)
   - PointCut과 Advice를 가진다
   - PointCut이 실행가능하도록 선택한 지점에서 Advice를 실행하도록 한다
+  - createMethodInterceptor
+    - pointCut으로 매칭된 경우 advice를 통해 실행하도록하며 매칭되지 않는 경우 proxy의 기본 실행을 동작시킨다
 - PointCut
   - Advice가 적용될 수 있는 지점을 결정한다
   - method가 실행가능한 메소드인지 확인할 수 있다
