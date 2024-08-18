@@ -63,7 +63,7 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
 
     private void registerBean(Class<?> clazz, Object bean) {
         if (bean instanceof FactoryBean<?> factoryBean) {
-            initializeBean(clazz, factoryBean.getObject());
+            initializeBean(factoryBean.getType(), factoryBean.getObject());
             return;
         }
         initializeBean(clazz, bean);
