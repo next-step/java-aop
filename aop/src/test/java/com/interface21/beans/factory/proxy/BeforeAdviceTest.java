@@ -28,13 +28,13 @@ class BeforeAdviceTest {
     void joinPoint를_실행하기_전_before를_먼저_실행한다() throws Throwable {
         BeforeAdvice beforeAdvice = spy(new BeforeAdvice() {
             @Override
-            void before(Method method, Object[] args, JoinPoint joinPoint) {
+            void before(Method method, Object[] args) {
             }
         });
         beforeAdvice.invoke(joinPoint);
 
         InOrder inOrder = inOrder(joinPoint, beforeAdvice);
-        inOrder.verify(beforeAdvice).before(method, arguments, joinPoint);
+        inOrder.verify(beforeAdvice).before(method, arguments);
         inOrder.verify(joinPoint).proceed();
     }
 

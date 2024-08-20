@@ -28,14 +28,14 @@ class AfterAdviceTest {
     void joinPoint를_실행한_후_afterReturning을_실행한다() throws Throwable {
         AfterAdvice afterAdvice = spy(new AfterAdvice() {
             @Override
-            void afterReturning(Object returnValue, Method method, Object[] args, JoinPoint joinPoint) {
+            void afterReturning(Object returnValue, Method method, Object[] args) {
             }
         });
         afterAdvice.invoke(joinPoint);
 
         InOrder inOrder = inOrder(joinPoint, afterAdvice);
         inOrder.verify(joinPoint).proceed();
-        inOrder.verify(afterAdvice).afterReturning("say", method, arguments, joinPoint);
+        inOrder.verify(afterAdvice).afterReturning("say", method, arguments);
     }
 
     private static class Simple {
