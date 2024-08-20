@@ -15,7 +15,8 @@ public class Advisor {
     public MethodInterceptor createMethodInterceptor() {
         return (obj, method, args, proxy) -> {
             if (pointCut.matches(method)) {
-                return advice.invoke(() -> proxy.invokeSuper(obj, args));
+                JoinPoint joinPoint = new SimpleJoinPoint(obj, method, args, proxy);
+                return advice.invoke(joinPoint);
             }
             return proxy.invokeSuper(obj, args);
         };
