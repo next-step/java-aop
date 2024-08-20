@@ -57,3 +57,8 @@ cligb를 구현할 때 스샷을 참고해서 아래 VM 옵션을 활성화한�
 ![](docs/images/add-vm-options.png)
 
 ![](docs/images/input-options.png)
+
+
+## 1단계 요구사항
+- [x] cglib 대문자 반환하게 만든다.
+- [x] dynamic proxy 대문자 반환하게 만든다.
