@@ -94,3 +94,8 @@ cligb를 구현할 때 스샷을 참고해서 아래 VM 옵션을 활성화한�
 
 - BeanFactory
   - 빈 생성 시 FactoryBean인 경우 반환되는 프록시 빈으로 등록한다
+
+- AfterAdvice
+  - invoke 호출 시 joinPoint를 실행하고 이후 정의된 afterReturning을 실행한다
+- BeforeAdvice
+  - invoke 호출 전 정의된 before를 실행하고 이후 joinPoint를 실행한다
