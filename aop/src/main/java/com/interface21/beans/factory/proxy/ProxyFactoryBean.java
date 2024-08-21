@@ -15,7 +15,11 @@ public class ProxyFactoryBean<T> implements FactoryBean<T> {
 
     @Override
     public T getObject() {
-        return (T) Enhancer.create(target.getType(), advisor.createMethodInterceptor());
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(target.getType());
+        enhancer.setCallback(advisor.createMethodInterceptor());
+
+        return (T) enhancer.create(target.getConstructorParameterTypes(), target.getConstructorParameters());
     }
 
     @Override

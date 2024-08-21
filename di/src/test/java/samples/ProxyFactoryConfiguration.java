@@ -11,11 +11,11 @@ import com.interface21.context.annotation.Configuration;
 public class ProxyFactoryConfiguration {
 
     @Bean
-    public FactoryBean<NameService> userService() {
+    public FactoryBean<NameService> userService() throws NoSuchMethodException {
         Advisor advisor = new Advisor(
                 method -> method.getName().equals("getName"),
                 new UpperCaseAdvice()
         );
-        return new ProxyFactoryBean<>(new Target<>(NameService.class), advisor);
+        return new ProxyFactoryBean<>(new Target<>(new NameService(), NameService.class.getConstructor()), advisor);
     }
 }
