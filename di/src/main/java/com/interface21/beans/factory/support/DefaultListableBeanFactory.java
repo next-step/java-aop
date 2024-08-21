@@ -4,6 +4,8 @@ import com.interface21.beans.BeanUtils;
 import com.interface21.beans.factory.ConfigurableListableBeanFactory;
 import com.interface21.beans.factory.FactoryBean;
 import com.interface21.beans.factory.config.BeanDefinition;
+import com.interface21.beans.factory.config.BeanPostProcessor;
+import com.interface21.beans.factory.config.FactoryBeanPostProcessor;
 import com.interface21.context.annotation.AnnotatedBeanDefinition;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
@@ -21,6 +23,8 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
     private final Map<Class<?>, Object> beans = new HashMap<>();
 
     private final Map<Class<?>, BeanDefinition> beanDefinitions = new HashMap<>();
+
+    private final List<BeanPostProcessor> beanPostProcessors = List.of(new FactoryBeanPostProcessor());
 
     @Override
     public void preInstantiateSingletons() {
@@ -63,15 +67,20 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
 
     private void registerBean(Class<?> clazz, Object bean) {
         if (bean instanceof FactoryBean<?> factoryBean) {
-            initializeBean(factoryBean.getType(), factoryBean.getObject());
+            initializeBean(factoryBean.getType(), factoryBean);
             return;
         }
         initializeBean(clazz, bean);
     }
 
     private void initializeBean(Class<?> clazz, Object bean) {
-        beans.put(clazz, bean);
-        initialize(bean, clazz);
+        Object processedBean = beanPostProcessors.stream()
+                .filter(beanPostProcessor -> beanPostProcessor.accept(bean))
+                .findFirst()
+                .map(beanPostProcessor -> beanPostProcessor.postInitialization(bean))
+                .orElse(bean);
+        beans.put(clazz, processedBean);
+        initialize(processedBean, clazz);
     }
 
     private void initialize(Object bean, Class<?> beanClass) {
