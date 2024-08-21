@@ -10,6 +10,7 @@ public class TransactionalPointCut implements PointCut {
     @Override
     public boolean matches(Method method) {
         Class<?> declaringClass = method.getDeclaringClass();
-        return declaringClass.isAnnotationPresent(Transactional.class);
+        return declaringClass.isAnnotationPresent(Transactional.class)
+                || method.isAnnotationPresent(Transactional.class);
     }
 }
