@@ -1,15 +1,23 @@
 package study.dynamic;
 
 class HelloTarget implements Hello {
-    public String sayHello(String name) {
+    @Override
+    public String sayHello(final String name) {
         return "Hello " + name;
     }
 
-    public String sayHi(String name) {
+    @Override
+    public String sayHi(final String name) {
         return "Hi " + name;
     }
 
-    public String sayThankYou(String name) {
+    @Override
+    public String sayThankYou(final String name) {
         return "Thank You " + name;
+    }
+
+    @Override
+    public String pingpong(final String name) {
+        return "Pong " + name;
     }
 }
