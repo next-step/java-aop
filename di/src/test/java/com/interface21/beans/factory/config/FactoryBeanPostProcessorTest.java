@@ -10,8 +10,8 @@ class FactoryBeanPostProcessorTest {
     private final FactoryBeanPostProcessor beanPostProcessor = new FactoryBeanPostProcessor();
 
     @Test
-    void FactoryBean에_대해서_지원한다() {
-        Target<Hello> target = new Target<>(new Hello(), new Object[0]);
+    void FactoryBean에_대해서_지원한다() throws NoSuchMethodException {
+        Target<Hello> target = new Target<>(new Hello(), Hello.class.getConstructor());
         Advisor advisor = new Advisor(
                 method -> method.getName().startsWith("say"),
                 new UpperCaseAdvice()
