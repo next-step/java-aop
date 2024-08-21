@@ -1,5 +1,6 @@
 package com.interface21.beans.factory.config;
 
+import com.interface21.beans.factory.BeanFactory;
 import com.interface21.beans.factory.FactoryBean;
 import com.interface21.beans.factory.proxy.Advisor;
 import com.interface21.beans.factory.proxy.ProxyFactoryBean;
@@ -16,9 +17,14 @@ import java.util.Arrays;
 public class TransactionBeanPostProcessor implements BeanPostProcessor {
 
     private final Advisor transactionAdvisor;
+    private final BeanFactory beanFactory;
 
-    public TransactionBeanPostProcessor(PlatformTransactionManager transactionManager) {
-        this.transactionAdvisor = new Advisor(new TransactionalPointCut(), new TransactionAdvice(transactionManager));
+    public TransactionBeanPostProcessor(BeanFactory beanFactory) {
+        this.transactionAdvisor = new Advisor(
+                new TransactionalPointCut(),
+                new TransactionAdvice(beanFactory.getBean(PlatformTransactionManager.class))
+        );
+        this.beanFactory = beanFactory;
     }
 
     @Override
@@ -35,7 +41,11 @@ public class TransactionBeanPostProcessor implements BeanPostProcessor {
     @Override
     public Object postInitialization(Object bean) {
         Constructor<?> injectedConstructor = BeanFactoryUtils.getInjectedConstructor(bean.getClass());
-        FactoryBean<?> factoryBean = new ProxyFactoryBean<>(new Target<>(bean, injectedConstructor), transactionAdvisor);
+        FactoryBean<?> factoryBean = new ProxyFactoryBean<>(
+                new Target<>(bean, injectedConstructor),
+                transactionAdvisor,
+                beanFactory
+        );
         return factoryBean.getObject();
     }
 }

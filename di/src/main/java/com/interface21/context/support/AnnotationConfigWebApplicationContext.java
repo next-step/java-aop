@@ -7,7 +7,6 @@ import com.interface21.context.ApplicationContext;
 import com.interface21.context.annotation.AnnotatedBeanDefinitionReader;
 import com.interface21.context.annotation.ClassPathBeanDefinitionScanner;
 import com.interface21.context.annotation.ComponentScan;
-import com.interface21.transaction.PlatformTransactionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +53,7 @@ public class AnnotationConfigWebApplicationContext implements ApplicationContext
 
     private void registerBeanPostProcessors() {
         beanFactory.registerBeanPostProcessor(new FactoryBeanPostProcessor());
-        beanFactory.registerBeanPostProcessor(new TransactionBeanPostProcessor(getBean(PlatformTransactionManager.class)));
+        beanFactory.registerBeanPostProcessor(new TransactionBeanPostProcessor(this.beanFactory));
     }
 
     @Override
