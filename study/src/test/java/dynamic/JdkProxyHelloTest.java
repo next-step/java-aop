@@ -20,6 +20,7 @@ class JdkProxyHelloTest {
         assertThat(hello.sayHello("Toby")).isEqualTo("HELLO TOBY");
         assertThat(hello.sayHi("Toby")).isEqualTo("HI TOBY");
         assertThat(hello.sayThankYou("Toby")).isEqualTo("THANK YOU TOBY");
+        assertThat(hello.pingPong("Toby")).isEqualTo("Ping Pong Toby");
     }
 }
 

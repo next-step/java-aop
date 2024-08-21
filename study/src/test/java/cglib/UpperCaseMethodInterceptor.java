@@ -1,9 +1,10 @@
 package cglib;
 
 import java.lang.reflect.Method;
+import matcher.MethodMatcher;
+import matcher.SayPrefixMethodMatcher;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
-import org.springframework.aop.MethodMatcher;
 
 public class UpperCaseMethodInterceptor implements MethodInterceptor {
 
@@ -16,7 +17,7 @@ public class UpperCaseMethodInterceptor implements MethodInterceptor {
     @Override
     public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
         String result = (String) methodProxy.invokeSuper(o, objects);
-        if (methodMatcher.matches(method, o.getClass())) {
+        if (methodMatcher.matches(method, o.getClass(), objects)) {
             return result.toUpperCase();
         }
         return result;

@@ -17,5 +17,6 @@ class CglibProxyHelloTest {
         assertThat(helloTargetProxy.sayHello("Toby")).isEqualTo("HELLO TOBY");
         assertThat(helloTargetProxy.sayHi("Toby")).isEqualTo("HI TOBY");
         assertThat(helloTargetProxy.sayThankYou("Toby")).isEqualTo("THANK YOU TOBY");
+        assertThat(helloTargetProxy.pingPong("Toby")).isEqualTo("Ping Pong Toby");
     }
 }

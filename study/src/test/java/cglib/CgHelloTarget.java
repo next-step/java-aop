@@ -13,4 +13,8 @@ public class CgHelloTarget {
     public String sayThankYou(String name) {
         return "Thank You " + name;
     }
+
+    public String pingPong(String name) {
+        return "Ping Pong " + name;
+    }
 }
