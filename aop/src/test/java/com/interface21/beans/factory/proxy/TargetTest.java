@@ -18,10 +18,5 @@ class TargetTest {
         );
     }
 
-    @Test
-    void constructor에_들어간_파라미터객체를_추출할_수_있다() {
-
-    }
-
     public static class TargetClass {}
 }
