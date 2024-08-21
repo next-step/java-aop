@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
@@ -35,5 +36,19 @@ class TransactionAdviceTest {
         inOrder.verify(transactionManager).begin();
         inOrder.verify(joinPoint).proceed();
         inOrder.verify(transactionManager).rollback();
+    }
+
+    @Test
+    void Transaction이_성공하면_commit한다() throws Throwable {
+        TransactionAdvice transactionAdvice = new TransactionAdvice(transactionManager);
+        when(joinPoint.proceed()).thenReturn("jin young");
+
+        Object actual = transactionAdvice.invoke(joinPoint);
+        assertThat(actual).isEqualTo("jin young");
+
+        InOrder inOrder = Mockito.inOrder(joinPoint, transactionManager);
+        inOrder.verify(transactionManager).begin();
+        inOrder.verify(joinPoint).proceed();
+        inOrder.verify(transactionManager).commit();
     }
 }
