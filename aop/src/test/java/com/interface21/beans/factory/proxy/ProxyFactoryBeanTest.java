@@ -9,7 +9,7 @@ class ProxyFactoryBeanTest {
 
     @Test
     void 프록시빈을_생성한다() {
-        Target<Hello> target = new Target<>(Hello.class);
+        Target<Hello> target = new Target<>(new Hello(), new Object[0]);
         Advisor advisor = new Advisor(
                 method -> method.getName().startsWith("say"),
                 new UpperCaseAdvice()
@@ -25,7 +25,7 @@ class ProxyFactoryBeanTest {
 
     @Test
     void 프록시빈의_타입을_반환한다() {
-        Target<Hello> target = new Target<>(Hello.class);
+        Target<Hello> target = new Target<>(new Hello(), new Object[0]);
         Advisor advisor = new Advisor(
                 method -> method.getName().startsWith("say"),
                 new UpperCaseAdvice()

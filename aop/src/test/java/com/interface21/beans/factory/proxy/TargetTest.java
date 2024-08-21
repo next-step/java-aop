@@ -10,7 +10,7 @@ class TargetTest {
     @Test
     void 객체를_받아_Target을_생성한다() {
         TargetClass givenTarget = new TargetClass();
-        Target<TargetClass> actual = new Target<>(givenTarget);
+        Target<TargetClass> actual = new Target<>(givenTarget, new Object[0]);
 
         assertAll(
                 () -> assertThat(actual.getType()).isEqualTo(TargetClass.class),
