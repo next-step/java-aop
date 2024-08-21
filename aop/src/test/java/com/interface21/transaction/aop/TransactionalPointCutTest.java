@@ -19,7 +19,7 @@ class TransactionalPointCutTest {
 
     @Test
     void 메소드에_Transactional_어노테이션이_있는_경우_true를_반환한다() throws NoSuchMethodException {
-        Method method = MethodTransactional.class.getMethod("getName");
+        Method method = MethodTransactional.class.getMethod("yesTransactional");
 
         boolean actual = new TransactionalPointCut().matches(method);
         assertThat(actual).isTrue();
@@ -44,8 +44,8 @@ class TransactionalPointCutTest {
     private static class MethodTransactional {
 
         @Transactional
-        public String getName() {
-            return "jinyoung";
+        public String yesTransactional() {
+            return "yes";
         }
 
         public String noTransactional() {
