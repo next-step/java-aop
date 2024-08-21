@@ -8,9 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 class TargetTest {
 
     @Test
-    void 객체를_받아_Target을_생성한다() {
+    void 객체를_받아_Target을_생성한다() throws NoSuchMethodException {
         TargetClass givenTarget = new TargetClass();
-        Target<TargetClass> actual = new Target<>(givenTarget, new Object[0]);
+        Target<TargetClass> actual = new Target<>(givenTarget, TargetClass.class.getConstructor());
 
         assertAll(
                 () -> assertThat(actual.getType()).isEqualTo(TargetClass.class),

@@ -8,8 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 class ProxyFactoryBeanTest {
 
     @Test
-    void 프록시빈을_생성한다() {
-        Target<Hello> target = new Target<>(new Hello(), new Object[0]);
+    void 프록시빈을_생성한다() throws NoSuchMethodException {
+        Target<Hello> target = new Target<>(new Hello(), Hello.class.getConstructor());
         Advisor advisor = new Advisor(
                 method -> method.getName().startsWith("say"),
                 new UpperCaseAdvice()
@@ -24,8 +24,8 @@ class ProxyFactoryBeanTest {
     }
 
     @Test
-    void 프록시빈의_타입을_반환한다() {
-        Target<Hello> target = new Target<>(new Hello(), new Object[0]);
+    void 프록시빈의_타입을_반환한다() throws NoSuchMethodException {
+        Target<Hello> target = new Target<>(new Hello(), Hello.class.getConstructor());
         Advisor advisor = new Advisor(
                 method -> method.getName().startsWith("say"),
                 new UpperCaseAdvice()

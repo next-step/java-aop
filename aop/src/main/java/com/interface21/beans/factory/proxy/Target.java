@@ -1,15 +1,17 @@
 package com.interface21.beans.factory.proxy;
 
+import java.lang.reflect.Constructor;
+
 public class Target<T> {
 
     private final Class<T> type;
     private final T target;
-    private final Object[] constructorParameters;
+    private final Class<?>[] constructorParameterTypes;
 
-    public Target(T target, Object[] constructorParameters) {
+    public Target(T target, Constructor<?> constructor) {
         this.type = (Class<T>) target.getClass();
         this.target = target;
-        this.constructorParameters = constructorParameters;
+        this.constructorParameterTypes = constructor.getParameterTypes();
     }
 
     public Class<T> getType() {

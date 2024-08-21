@@ -4,10 +4,12 @@ import com.interface21.beans.factory.FactoryBean;
 import com.interface21.beans.factory.proxy.Advisor;
 import com.interface21.beans.factory.proxy.ProxyFactoryBean;
 import com.interface21.beans.factory.proxy.Target;
+import com.interface21.beans.factory.support.BeanFactoryUtils;
 import com.interface21.transaction.PlatformTransactionManager;
 import com.interface21.transaction.aop.TransactionAdvice;
 import com.interface21.transaction.aop.TransactionalPointCut;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
@@ -32,7 +34,8 @@ public class TransactionBeanPostProcessor implements BeanPostProcessor {
 
     @Override
     public Object postInitialization(Object bean) {
-        FactoryBean<?> factoryBean = new ProxyFactoryBean<>(new Target<>(bean.getClass()), transactionAdvisor);
+        Constructor<?> injectedConstructor = BeanFactoryUtils.getInjectedConstructor(bean.getClass());
+        FactoryBean<?> factoryBean = new ProxyFactoryBean<>(new Target<>(bean, injectedConstructor), transactionAdvisor);
         return factoryBean.getObject();
     }
 }
