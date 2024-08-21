@@ -99,3 +99,9 @@ cligb를 구현할 때 스샷을 참고해서 아래 VM 옵션을 활성화한�
   - invoke 호출 시 joinPoint를 실행하고 이후 정의된 afterReturning을 실행한다
 - BeforeAdvice
   - invoke 호출 전 정의된 before를 실행하고 이후 joinPoint를 실행한다
+
+## 3단계 - @Transactional 구현하기
+- Transcation Aop 처리
+  - Transactional어노테이션이 클래스레벨 혹은 메소드 레벨에 붙어있는 경우 PointCut 대상이 된다
+  - joinPoint 실행 앞뒤로 트랜잭션처리를 한다
+    - advice는 PlatformTransactionManager를 가지며 실행 후 rollback 혹은 commit 처리를 할 수 있다
