@@ -25,6 +25,14 @@ class TransactionalPointCutTest {
         assertThat(actual).isTrue();
     }
 
+    @Test
+    void Transcational이_없는_경우_false를_반환한다() throws NoSuchMethodException {
+        Method method = MethodTransactional.class.getMethod("noTransactional");
+
+        boolean actual = new TransactionalPointCut().matches(method);
+        assertThat(actual).isFalse();
+    }
+
     @Transactional
     private static class ClassTransactional {
 
@@ -38,6 +46,10 @@ class TransactionalPointCutTest {
         @Transactional
         public String getName() {
             return "jinyoung";
+        }
+
+        public String noTransactional() {
+            return "no";
         }
     }
 }
