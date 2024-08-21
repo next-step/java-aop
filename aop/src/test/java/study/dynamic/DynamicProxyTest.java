@@ -2,6 +2,8 @@ package study.dynamic;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import study.MethodMatcher;
+import study.SayUppercaseMethodMatcher;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -26,22 +28,25 @@ public class DynamicProxyTest {
             softly.assertThat(hello.sayHello(name)).isEqualTo("HELLO JONGMIN");
             softly.assertThat(hello.sayHi(name)).isEqualTo("HI JONGMIN");
             softly.assertThat(hello.sayThankYou(name)).isEqualTo("THANK YOU JONGMIN");
+            softly.assertThat(hello.pingpong(name)).isEqualTo("Pong jongmin");
         });
     }
 
     static class UpperCaseInvocationHandler implements InvocationHandler {
 
         private final Object instance;
+        private final MethodMatcher methodMatcher;
 
         public UpperCaseInvocationHandler(final Object instance) {
             this.instance = instance;
+            this.methodMatcher = new SayUppercaseMethodMatcher();
         }
 
         @Override
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
             final Object result = method.invoke(instance, args);
-            if (result instanceof final String s && method.getName().startsWith("say")) {
-                return s.toUpperCase();
+            if (methodMatcher.matches(method, method.getDeclaringClass(), args)) {
+                return ((String) result).toUpperCase();
             }
             return result;
         }

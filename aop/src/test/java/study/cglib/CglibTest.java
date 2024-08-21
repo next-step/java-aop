@@ -1,10 +1,12 @@
 package study.cglib;
 
+import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import net.sf.cglib.proxy.Enhancer;
+import study.MethodMatcher;
+import study.SayUppercaseMethodMatcher;
 
 import java.lang.reflect.Method;
 
@@ -26,17 +28,23 @@ public class CglibTest {
             softly.assertThat(proxy.sayHello(name)).isEqualTo("HELLO JONGMIN");
             softly.assertThat(proxy.sayHi(name)).isEqualTo("HI JONGMIN");
             softly.assertThat(proxy.sayThankYou(name)).isEqualTo("THANK YOU JONGMIN");
+            softly.assertThat(proxy.pingpong(name)).isEqualTo("Pong jongmin");
         });
     }
 
     static class UpperCaseMethodInterceptor implements MethodInterceptor {
 
+        private final MethodMatcher methodMatcher;
+
+        public UpperCaseMethodInterceptor() {
+            methodMatcher = new SayUppercaseMethodMatcher();
+        }
 
         @Override
         public Object intercept(final Object o, final Method method, final Object[] objects, final MethodProxy methodProxy) throws Throwable {
             final Object result = methodProxy.invokeSuper(o, objects);
-            if(result instanceof final String s && method.getName().startsWith("say")) {
-                return s.toUpperCase();
+            if (methodMatcher.matches(method, method.getDeclaringClass(), objects)) {
+                return ((String) result).toUpperCase();
             }
             return result;
         }
