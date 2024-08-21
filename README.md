@@ -69,3 +69,33 @@ cligb를 구현할 때 스샷을 참고해서 아래 VM 옵션을 활성화한�
     - 메소드 실행에서 대문자를 반환하도록 intercept 처리한다
 
 - say로 시작하는 메소드에 대해서만 반환 값을 대문자로 변환하도록 한다
+
+## 2단계 - Proxy와 Bean 의존관계
+- ProxyBean
+  - getObject에서 cblib을 통한 proxy 객체를 생성하여 반환한다
+  - 프록시빈의 타입을 반환한다
+  - Enhancer에서 보유중인 Advisors를 돌면서 pointCut과 Advice를 callBack으로 지저안다
+- Aspect(Advisor)
+  - PointCut과 Advice를 가진다
+  - PointCut이 실행가능하도록 선택한 지점에서 Advice를 실행하도록 한다
+  - createMethodInterceptor
+    - pointCut으로 매칭된 경우 advice를 통해 실행하도록하며 매칭되지 않는 경우 proxy의 기본 실행을 동작시킨다
+- PointCut
+  - Advice가 적용될 수 있는 지점을 결정한다
+  - method가 실행가능한 메소드인지 확인할 수 있다
+- Advice
+  - 실제로 aop가 실행되는 코드로 실행된다
+  - 실행가능한 포인트에서 각 advice 동작을 구성한다
+  - JoinPoint를 받아 구현내용을 invoke 처리한다
+- Target
+  - 실행의 대상이 되는 target class 정보를 가진다
+- JoinPoint
+  - Addvice를 적용하는 대상이 된다
+
+- BeanFactory
+  - 빈 생성 시 FactoryBean인 경우 반환되는 프록시 빈으로 등록한다
+
+- AfterAdvice
+  - invoke 호출 시 joinPoint를 실행하고 이후 정의된 afterReturning을 실행한다
+- BeforeAdvice
+  - invoke 호출 전 정의된 before를 실행하고 이후 joinPoint를 실행한다

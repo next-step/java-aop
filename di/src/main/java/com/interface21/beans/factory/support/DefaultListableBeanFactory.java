@@ -2,6 +2,7 @@ package com.interface21.beans.factory.support;
 
 import com.interface21.beans.BeanUtils;
 import com.interface21.beans.factory.ConfigurableListableBeanFactory;
+import com.interface21.beans.factory.FactoryBean;
 import com.interface21.beans.factory.config.BeanDefinition;
 import com.interface21.context.annotation.AnnotatedBeanDefinition;
 import jakarta.annotation.PostConstruct;
@@ -44,8 +45,7 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         BeanDefinition beanDefinition = beanDefinitions.get(clazz);
         if (beanDefinition instanceof AnnotatedBeanDefinition) {
             Optional<Object> optionalBean = createAnnotatedBean(beanDefinition);
-            optionalBean.ifPresent(b -> beans.put(clazz, b));
-            initialize(bean, clazz);
+            optionalBean.ifPresent(b -> registerBean(clazz, b));
             return (T) optionalBean.orElse(null);
         }
 
@@ -57,9 +57,21 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         beanDefinition = beanDefinitions.get(concreteClazz.get());
         log.debug("BeanDefinition : {}", beanDefinition);
         bean = inject(beanDefinition);
-        beans.put(concreteClazz.get(), bean);
-        initialize(bean, concreteClazz.get());
+        registerBean(concreteClazz.get(), bean);
         return (T) bean;
+    }
+
+    private void registerBean(Class<?> clazz, Object bean) {
+        if (bean instanceof FactoryBean<?> factoryBean) {
+            initializeBean(factoryBean.getType(), factoryBean.getObject());
+            return;
+        }
+        initializeBean(clazz, bean);
+    }
+
+    private void initializeBean(Class<?> clazz, Object bean) {
+        beans.put(clazz, bean);
+        initialize(bean, clazz);
     }
 
     private void initialize(Object bean, Class<?> beanClass) {
@@ -70,7 +82,7 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         for (Method initializeMethod : initializeMethods) {
             log.debug("@PostConstruct Initialize Method : {}", initializeMethod);
             BeanFactoryUtils.invokeMethod(initializeMethod, bean,
-                populateArguments(initializeMethod.getParameterTypes()));
+                    populateArguments(initializeMethod.getParameterTypes()));
         }
     }
 
