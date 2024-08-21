@@ -1,10 +1,13 @@
 package com.interface21.context.support;
 
+import com.interface21.beans.factory.config.FactoryBeanPostProcessor;
+import com.interface21.beans.factory.config.TransactionBeanPostProcessor;
 import com.interface21.beans.factory.support.DefaultListableBeanFactory;
 import com.interface21.context.ApplicationContext;
 import com.interface21.context.annotation.AnnotatedBeanDefinitionReader;
 import com.interface21.context.annotation.ClassPathBeanDefinitionScanner;
 import com.interface21.context.annotation.ComponentScan;
+import com.interface21.transaction.PlatformTransactionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +32,8 @@ public class AnnotationConfigWebApplicationContext implements ApplicationContext
             final var scanner = new ClassPathBeanDefinitionScanner(beanFactory);
             scanner.doScan(basePackages);
         }
+
+        registerBeanPostProcessors();
         beanFactory.preInstantiateSingletons();
     }
 
@@ -45,6 +50,11 @@ public class AnnotationConfigWebApplicationContext implements ApplicationContext
             basePackages.addAll(Arrays.asList(componentScan.value()));
         }
         return basePackages.toArray();
+    }
+
+    private void registerBeanPostProcessors() {
+        beanFactory.registerBeanPostProcessor(new FactoryBeanPostProcessor());
+        beanFactory.registerBeanPostProcessor(new TransactionBeanPostProcessor(getBean(PlatformTransactionManager.class)));
     }
 
     @Override
