@@ -2,6 +2,7 @@ package com.interface21.framework;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class Advised {
 
@@ -36,20 +37,20 @@ public class Advised {
     }
 
     public void before(MethodInvocation invocation) {
-        advisors.stream()
-            .filter(Advisor::isBeforeAdvice)
-            .forEach(advisor -> invoke(invocation, advisor));
+        invokeAdvice(invocation, Advisor::isBeforeAdvice);
     }
 
     public void after(MethodInvocation invocation) {
-        advisors.stream()
-            .filter(Advisor::isAfterAdvice)
-            .forEach(advisor -> invoke(invocation, advisor));
+        invokeAdvice(invocation, Advisor::isAfterAdvice);
     }
 
     public void afterReturning(MethodInvocation invocation) {
+        invokeAdvice(invocation, Advisor::isAfterReturningAdvice);
+    }
+
+    private void invokeAdvice(MethodInvocation invocation, Predicate<Advisor> filter) {
         advisors.stream()
-            .filter(Advisor::isAfterReturningAdvice)
+            .filter(filter)
             .forEach(advisor -> invoke(invocation, advisor));
     }
 
