@@ -8,7 +8,7 @@ public interface MethodInvocation extends JoinPoint {
 
     Object[] getArguments();
 
-    Object getTarget();
+    Target getTarget();
 
     Object getReturnValue();
 

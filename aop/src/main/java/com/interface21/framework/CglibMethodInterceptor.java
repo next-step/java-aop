@@ -18,7 +18,7 @@ public class CglibMethodInterceptor implements MethodInterceptor {
             return proxy.invokeSuper(obj, args);
         }
 
-        CglibMethodInvocation invocation = new CglibMethodInvocation(proxy, obj, method, args);
+        CglibMethodInvocation invocation = new CglibMethodInvocation(proxy, new ObjectTarget(obj), method, args);
         try {
             advised.before(invocation);
             invocation.proceed();

@@ -6,14 +6,14 @@ import net.sf.cglib.proxy.MethodProxy;
 public class CglibMethodInvocation implements MethodInvocation {
 
     private final MethodProxy proxy;
-    private final Object target;
+    private final Target target;
     private final Method method;
     private final Object[] arguments;
     private Object returnValue;
 
-    public CglibMethodInvocation(MethodProxy proxy, Object obj, Method method, Object[] args) {
+    public CglibMethodInvocation(MethodProxy proxy, Target target, Method method, Object[] args) {
         this.proxy = proxy;
-        this.target = obj;
+        this.target = target;
         this.method = method;
         this.arguments = args;
     }
@@ -39,13 +39,13 @@ public class CglibMethodInvocation implements MethodInvocation {
     }
 
     @Override
-    public Object getTarget() {
+    public Target getTarget() {
         return target;
     }
 
     @Override
     public Object proceed() throws Throwable {
-        Object result = proxy.invokeSuper(target, arguments);
+        Object result = proxy.invokeSuper(target.getTarget(), arguments);
         returnValue = result;
         return result;
     }
