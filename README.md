@@ -63,6 +63,6 @@ cligb를 구현할 때 스샷을 참고해서 아래 VM 옵션을 활성화한�
 - [x] : cglib proxy (인터페이스를 사용하지 않고 구현체만으로 대문자를 반환하도록 변한한다)
 
 ### 🚀 2단계 - Proxy와 Bean 의존관계
-- [ ] : DI 컨테이너의 Bean과 Proxy를 연결 (FactoryBean 구현체를 DI 컨테이너에 등록하지 않고, getObject() 메소드를 통해 반환)
-- [ ] : 재사용 가능한 FactoryBean (Target, Advice, PointCut을 연결해 Proxy를 생성하는 재사용 가능한 FactoryBean을 추가)
+- [x] : DI 컨테이너의 Bean과 Proxy를 연결 (FactoryBean 구현체를 DI 컨테이너에 등록하지 않고, getObject() 메소드를 통해 반환)
+- [x] : 재사용 가능한 FactoryBean (Target, Advice, PointCut을 연결해 Proxy를 생성하는 재사용 가능한 FactoryBean을 추가)
 
