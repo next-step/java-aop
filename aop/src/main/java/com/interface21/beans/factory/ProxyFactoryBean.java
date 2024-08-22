@@ -5,9 +5,9 @@ import com.interface21.framework.AopProxy;
 import com.interface21.framework.AopProxyFactory;
 import com.interface21.framework.DefaultAopProxyFactory;
 
-public class ProxyFactoryBean implements FactoryBean<Object>{
+public class ProxyFactoryBean<T> implements FactoryBean<T>{
 
-    private Object singletonInstance;
+    private T singletonInstance;
     private final Advised advised;
 
     private final AopProxyFactory aopProxyFactory;
@@ -18,10 +18,10 @@ public class ProxyFactoryBean implements FactoryBean<Object>{
     }
 
     @Override
-    public Object getObject() {
+    public T getObject() {
         if (singletonInstance == null) {
             AopProxy aopProxy = createAopProxy();
-            singletonInstance = aopProxy.getProxy();
+            singletonInstance = (T) aopProxy.getProxy();
         }
         return singletonInstance;
     }
