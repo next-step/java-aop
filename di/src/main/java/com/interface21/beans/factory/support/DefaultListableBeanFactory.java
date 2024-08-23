@@ -3,6 +3,7 @@ package com.interface21.beans.factory.support;
 import com.interface21.beans.BeanUtils;
 import com.interface21.beans.factory.ConfigurableListableBeanFactory;
 import com.interface21.beans.factory.config.BeanDefinition;
+import com.interface21.beans.factory.config.BeanPostProcessor;
 import com.interface21.context.annotation.AnnotatedBeanDefinition;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
@@ -20,6 +21,8 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
     private final Map<Class<?>, Object> beans = new HashMap<>();
 
     private final Map<Class<?>, BeanDefinition> beanDefinitions = new HashMap<>();
+
+    private final Set<BeanPostProcessor> beanPostProcessors = new HashSet<>();
 
     @Override
     public void preInstantiateSingletons() {
@@ -44,8 +47,8 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         BeanDefinition beanDefinition = beanDefinitions.get(clazz);
         if (beanDefinition instanceof AnnotatedBeanDefinition) {
             Optional<Object> optionalBean = createAnnotatedBean(beanDefinition);
-            optionalBean.ifPresent(b -> beans.put(clazz, b));
-            initialize(bean, clazz);
+            optionalBean.ifPresent(b -> initialize(b, clazz));
+
             return (T) optionalBean.orElse(null);
         }
 
@@ -56,13 +59,29 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
 
         beanDefinition = beanDefinitions.get(concreteClazz.get());
         log.debug("BeanDefinition : {}", beanDefinition);
-        bean = inject(beanDefinition);
-        beans.put(concreteClazz.get(), bean);
-        initialize(bean, concreteClazz.get());
+        bean = initialize(inject(beanDefinition), concreteClazz.get());
         return (T) bean;
     }
 
-    private void initialize(Object bean, Class<?> beanClass) {
+    private Object initialize(Object bean, Class<?> beanClass) {
+        bean = beforeInitialize(bean);
+        beans.put(beanClass, bean);
+        afterInitialize(bean, beanClass);
+        return bean;
+    }
+
+    private Object beforeInitialize(Object bean) {
+        for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
+            bean = beanPostProcessor.postInitialization(bean);
+            if (bean != null) {
+                return bean;
+            }
+        }
+        return bean;
+    }
+
+
+    private void afterInitialize(Object bean, Class<?> beanClass) {
         Set<Method> initializeMethods = BeanFactoryUtils.getBeanMethods(beanClass, PostConstruct.class);
         if (initializeMethods.isEmpty()) {
             return;
@@ -139,5 +158,9 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
     public void registerBeanDefinition(Class<?> clazz, BeanDefinition beanDefinition) {
         log.debug("register bean : {}", clazz);
         beanDefinitions.put(clazz, beanDefinition);
+    }
+
+    public void addBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
+        beanPostProcessors.add(beanPostProcessor);
     }
 }
