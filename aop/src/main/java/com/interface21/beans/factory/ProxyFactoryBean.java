@@ -1,6 +1,7 @@
 package com.interface21.beans.factory;
 
-import com.interface21.framework.ProxyFactory;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
 
 public class ProxyFactoryBean<T> implements FactoryBean {
 
@@ -22,7 +23,24 @@ public class ProxyFactoryBean<T> implements FactoryBean {
 
     @Override
     public T getObject() {
-        ProxyFactory<T> proxyFactory = new ProxyFactory<>(target, advice, pointCut);
-        return proxyFactory.getProxy();
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(target);
+        enhancer.setCallback(methodInterceptor());
+        return (T) enhancer.create();
+    }
+
+    private MethodInterceptor methodInterceptor() {
+        return (object, method, args, methodProxy) -> {
+            if (pointCut.matches(method)) {
+                advice.before();
+            }
+
+            Object result = methodProxy.invokeSuper(object, args);
+
+            if (pointCut.matches(method)) {
+                advice.after();
+            }
+            return result;
+        };
     }
 }
