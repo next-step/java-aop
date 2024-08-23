@@ -39,7 +39,7 @@ class CglibAopProxyTest {
         Class<?> proxyClass = proxy.getClass();
 
         // then
-        assertEquals("com.interface21.framework.CglibAopProxyTest$HelloService$$EnhancerByCGLIB$$8ffef10d", proxyClass.getName());
+        assertEquals("com.interface21.framework.HelloService$$EnhancerByCGLIB$$76fd2896", proxyClass.getName());
     }
 
     @DisplayName("프록시 객체를 생성하고 메서드를 호출한다.")
@@ -71,12 +71,6 @@ class CglibAopProxyTest {
         // then
         assertEquals("Method name: sayHello\n", outputStreamCaptor.toString());
         assertEquals("HELLO, WORLD", result);
-    }
-
-    public static class HelloService {
-        public String sayHello(String name) {
-            return "Hello, " + name;
-        }
     }
 
     public static class UpperCaseAdvice implements AfterReturningAdvice {
