@@ -108,6 +108,7 @@ cligb를 구현할 때 스샷을 참고해서 아래 VM 옵션을 활성화한�
 
 - BeanPostProcessor
   - bean이 해당 processor를 실행가능한지 여부를 판단한다
+  - bean이 하나의 BeanPostProcessor가 처리가능한 경우 예외를 던진다
   - bean을 받아 postInitialization 처리를 실행한다
   - FactoryBeanPostProcessor
     - FactoryBean을 받아 object를 반환한다

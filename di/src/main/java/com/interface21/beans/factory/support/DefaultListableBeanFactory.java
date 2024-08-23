@@ -47,9 +47,9 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
 
         BeanDefinition beanDefinition = beanDefinitions.get(clazz);
         if (beanDefinition instanceof AnnotatedBeanDefinition) {
-            Optional<Object> optionalBean = createAnnotatedBean(beanDefinition);
-            optionalBean.ifPresent(b -> registerBean(clazz, b));
-            return (T) optionalBean.orElse(null);
+            return (T) createAnnotatedBean(beanDefinition)
+                    .map(b -> registerBean(clazz, b))
+                    .orElse(null);
         }
 
         Optional<Class<?>> concreteClazz = BeanFactoryUtils.findConcreteClass(clazz, getBeanClasses());
@@ -60,26 +60,35 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         beanDefinition = beanDefinitions.get(concreteClazz.get());
         log.debug("BeanDefinition : {}", beanDefinition);
         bean = inject(beanDefinition);
-        registerBean(concreteClazz.get(), bean);
-        return (T) bean;
+        return (T) registerBean(concreteClazz.get(), bean);
     }
 
-    private void registerBean(Class<?> clazz, Object bean) {
+    private Object registerBean(Class<?> clazz, Object bean) {
         if (bean instanceof FactoryBean<?> factoryBean) {
-            initializeBean(factoryBean.getType(), factoryBean);
-            return;
+            return initializeBean(factoryBean.getType(), factoryBean);
         }
-        initializeBean(clazz, bean);
+        return initializeBean(clazz, bean);
     }
 
-    private void initializeBean(Class<?> clazz, Object bean) {
-        Object processedBean = beanPostProcessors.stream()
-                .filter(beanPostProcessor -> beanPostProcessor.accept(bean))
-                .findFirst()
-                .map(beanPostProcessor -> beanPostProcessor.postInitialization(bean))
-                .orElse(bean);
+    private Object initializeBean(Class<?> clazz, Object bean) {
+        Object processedBean = postProcess(bean);
         beans.put(clazz, processedBean);
         initialize(processedBean, clazz);
+        return processedBean;
+    }
+
+    private Object postProcess(Object bean) {
+        List<BeanPostProcessor> selectedBeanPostProcessor = beanPostProcessors.stream()
+                .filter(beanPostProcessor -> beanPostProcessor.accept(bean))
+                .toList();
+        if (selectedBeanPostProcessor.isEmpty()) {
+            return bean;
+        }
+        if (selectedBeanPostProcessor.size() == 1) {
+            return selectedBeanPostProcessor.get(0)
+                    .postInitialization(bean);
+        }
+        throw new IllegalStateException("PostProcess 처리는 한개만 가능합니다.");
     }
 
     private void initialize(Object bean, Class<?> beanClass) {
