@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import net.sf.cglib.proxy.Enhancer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import study.SayMethodMatcher;
 
 /**
  * CGLIB
@@ -30,14 +31,15 @@ public class CglibTest {
     void createProxy() {
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(HelloTarget.class);
-        enhancer.setCallback(new UppercaseMethodInterceptor());
+        enhancer.setCallback(new UppercaseMethodInterceptor(new SayMethodMatcher()));
 
         HelloTarget helloProxy = (HelloTarget) enhancer.create();
 
         assertAll(
                 () -> assertThat(helloProxy.sayHello("kim")).isEqualTo("HELLO KIM"),
                 () -> assertThat(helloProxy.sayHi("kim")).isEqualTo("HI KIM"),
-                () -> assertThat(helloProxy.sayThankYou("kim")).isEqualTo("THANK YOU KIM")
+                () -> assertThat(helloProxy.sayThankYou("kim")).isEqualTo("THANK YOU KIM"),
+                () -> assertThat(helloProxy.pingPong("kim")).isEqualTo("Ping Pong kim")
         );
     }
 }
