@@ -1,9 +1,9 @@
 package study.dynamicproxy;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.lang.reflect.Proxy;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -20,9 +20,9 @@ public class JdkDynamicProxyTest {
         );
 
         assertAll(
-                () -> Assertions.assertThat(helloProxy.sayHello("kim")).isEqualTo("HELLO KIM"),
-                () -> Assertions.assertThat(helloProxy.sayHi("kim")).isEqualTo("HI KIM"),
-                () -> Assertions.assertThat(helloProxy.sayThankYou("kim")).isEqualTo("THANK YOU KIM")
+                () -> assertThat(helloProxy.sayHello("kim")).isEqualTo("HELLO KIM"),
+                () -> assertThat(helloProxy.sayHi("kim")).isEqualTo("HI KIM"),
+                () -> assertThat(helloProxy.sayThankYou("kim")).isEqualTo("THANK YOU KIM")
         );
     }
 }
