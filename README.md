@@ -57,3 +57,12 @@ cligb를 구현할 때 스샷을 참고해서 아래 VM 옵션을 활성화한�
 ![](docs/images/add-vm-options.png)
 
 ![](docs/images/input-options.png)
+
+---
+
+# 요구사항 
+## 🚀 1단계 - JDK Proxy와 CGLIB Proxy
+- 문자열을 반환하는 코드에 프록시 적용하기 
+  - 인터페이스와 구현 클래스가 있을 때 **모든 메서드의 반환 값을 대문자로 변환한다**
+- [] JDK Dynamic Proxy로 구현하기 
+- [] CGLIB 으로 구현하기 
