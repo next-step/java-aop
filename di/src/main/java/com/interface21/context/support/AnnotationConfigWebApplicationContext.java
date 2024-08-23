@@ -1,6 +1,5 @@
 package com.interface21.context.support;
 
-import com.interface21.beans.factory.config.FactoryBeanPostProcessor;
 import com.interface21.beans.factory.config.TransactionBeanPostProcessor;
 import com.interface21.beans.factory.support.DefaultListableBeanFactory;
 import com.interface21.context.ApplicationContext;
@@ -32,7 +31,7 @@ public class AnnotationConfigWebApplicationContext implements ApplicationContext
             scanner.doScan(basePackages);
         }
 
-        registerBeanPostProcessors();
+        beanFactory.registerBeanPostProcessor(new TransactionBeanPostProcessor(this.beanFactory));
         beanFactory.preInstantiateSingletons();
     }
 
@@ -49,11 +48,6 @@ public class AnnotationConfigWebApplicationContext implements ApplicationContext
             basePackages.addAll(Arrays.asList(componentScan.value()));
         }
         return basePackages.toArray();
-    }
-
-    private void registerBeanPostProcessors() {
-        beanFactory.registerBeanPostProcessor(new FactoryBeanPostProcessor());
-        beanFactory.registerBeanPostProcessor(new TransactionBeanPostProcessor(this.beanFactory));
     }
 
     @Override

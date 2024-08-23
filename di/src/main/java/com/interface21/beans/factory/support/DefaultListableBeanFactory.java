@@ -2,7 +2,6 @@ package com.interface21.beans.factory.support;
 
 import com.interface21.beans.BeanUtils;
 import com.interface21.beans.factory.ConfigurableListableBeanFactory;
-import com.interface21.beans.factory.FactoryBean;
 import com.interface21.beans.factory.config.BeanDefinition;
 import com.interface21.beans.factory.config.BeanPostProcessor;
 import com.interface21.context.annotation.AnnotatedBeanDefinition;
@@ -48,7 +47,7 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         BeanDefinition beanDefinition = beanDefinitions.get(clazz);
         if (beanDefinition instanceof AnnotatedBeanDefinition) {
             return (T) createAnnotatedBean(beanDefinition)
-                    .map(b -> registerBean(clazz, b))
+                    .map(b -> initializeBean(clazz, b))
                     .orElse(null);
         }
 
@@ -60,14 +59,7 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         beanDefinition = beanDefinitions.get(concreteClazz.get());
         log.debug("BeanDefinition : {}", beanDefinition);
         bean = inject(beanDefinition);
-        return (T) registerBean(concreteClazz.get(), bean);
-    }
-
-    private Object registerBean(Class<?> clazz, Object bean) {
-        if (bean instanceof FactoryBean<?> factoryBean) {
-            return initializeBean(factoryBean.getType(), factoryBean);
-        }
-        return initializeBean(clazz, bean);
+        return (T) initializeBean(concreteClazz.get(), bean);
     }
 
     private Object initializeBean(Class<?> clazz, Object bean) {
