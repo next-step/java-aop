@@ -61,4 +61,8 @@ public class Advised {
             throw new RuntimeException(e);
         }
     }
+
+    public void afterThrowing(CglibMethodInvocation invocation) {
+        invokeAdvice(invocation, Advisor::isAfterThrowingAdvice);
+    }
 }
