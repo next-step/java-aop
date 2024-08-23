@@ -24,11 +24,11 @@ public class CglibMethodInterceptor implements MethodInterceptor {
             invocation.proceed();
             advised.after(invocation);
             advised.afterReturning(invocation);
+            return invocation.getReturnValue();
         } catch (Throwable ex) {
-            // 필요시 advised.afterThrowing(invocation, ex) 구현
+            invocation.setThrowable(ex);
+            advised.afterThrowing(invocation);
             throw ex;
         }
-
-        return invocation.getReturnValue();
     }
 }

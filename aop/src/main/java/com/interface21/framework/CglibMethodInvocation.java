@@ -10,6 +10,7 @@ public class CglibMethodInvocation implements MethodInvocation {
     private final Method method;
     private final Object[] arguments;
     private Object returnValue;
+    private Throwable throwable;
 
     public CglibMethodInvocation(MethodProxy proxy, Target target, Method method, Object[] args) {
         this.proxy = proxy;
@@ -48,5 +49,10 @@ public class CglibMethodInvocation implements MethodInvocation {
         Object result = proxy.invokeSuper(target.getTarget(), arguments);
         returnValue = result;
         return result;
+    }
+
+    @Override
+    public void setThrowable(Throwable ex) {
+        this.throwable = ex;
     }
 }
