@@ -2,16 +2,21 @@ package com.interface21.beans.factory.support;
 
 import com.interface21.beans.BeanUtils;
 import com.interface21.beans.factory.ConfigurableListableBeanFactory;
+import com.interface21.beans.factory.FactoryBean;
 import com.interface21.beans.factory.config.BeanDefinition;
 import com.interface21.context.annotation.AnnotatedBeanDefinition;
 import jakarta.annotation.PostConstruct;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultListableBeanFactory implements BeanDefinitionRegistry, ConfigurableListableBeanFactory {
 
@@ -57,6 +62,16 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         beanDefinition = beanDefinitions.get(concreteClazz.get());
         log.debug("BeanDefinition : {}", beanDefinition);
         bean = inject(beanDefinition);
+
+        if (bean instanceof FactoryBean) {
+            try {
+                bean = ((FactoryBean<?>) bean).getObject();
+            } catch (Exception e) {
+                log.error("FactoryBean getObject() error : {}", e.getMessage());
+                throw new RuntimeException(e);
+            }
+        }
+
         beans.put(concreteClazz.get(), bean);
         initialize(bean, concreteClazz.get());
         return (T) bean;
@@ -70,7 +85,7 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         for (Method initializeMethod : initializeMethods) {
             log.debug("@PostConstruct Initialize Method : {}", initializeMethod);
             BeanFactoryUtils.invokeMethod(initializeMethod, bean,
-                populateArguments(initializeMethod.getParameterTypes()));
+                                          populateArguments(initializeMethod.getParameterTypes()));
         }
     }
 
