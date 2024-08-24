@@ -12,7 +12,7 @@ class TruePointcutTest {
     @Test
     public void matchesTrue() throws Exception {
         // given
-        final TruePointcut truePointcut = new TruePointcut();
+        final TruePointcut truePointcut = TruePointcut.getInstance();
 
         // when
         final boolean actual = truePointcut.matches(mock(), Object.class);

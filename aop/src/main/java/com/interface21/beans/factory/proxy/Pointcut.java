@@ -4,6 +4,6 @@ import java.lang.reflect.Method;
 
 @FunctionalInterface
 public interface Pointcut {
-    Pointcut TRUE = TruePointcut.INSTANCE;
+    Pointcut TRUE = TruePointcut.getInstance();
     boolean matches(final Method method, final Class<?> targetClass);
 }
