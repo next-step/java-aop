@@ -11,15 +11,15 @@ import java.util.List;
 public class ProxyFactoryBean<T> implements FactoryBean<T> {
 
     private final Class<T> clazz;
-    private List<Advice> advice;
+    private final List<Advisor> advisors;
 
     public ProxyFactoryBean(final Class<T> clazz) {
         this.clazz = clazz;
-        this.advice = new ArrayList<>();
+        this.advisors = new ArrayList<>();
     }
 
-    public void addAdvice(final Advice advice) {
-        this.advice.add(advice);
+    public void addAdvisors(final Advisor advisor) {
+        this.advisors.add(advisor);
     }
 
     @Override
@@ -44,6 +44,8 @@ public class ProxyFactoryBean<T> implements FactoryBean<T> {
     }
 
     private void executeBeforeAdvices(final Method method, final Object[] objects, final MethodProxy methodProxy) throws Throwable {
+        final List<Advice> advice = getTargetAdvice(method, objects);
+
         for (final Advice targetAdvice : advice) {
             if (targetAdvice instanceof final MethodBeforeAdvice methodBeforeAdvice) {
                 methodBeforeAdvice.before(method, objects, methodProxy);
@@ -52,10 +54,19 @@ public class ProxyFactoryBean<T> implements FactoryBean<T> {
     }
 
     private void executeAfterReturningAdvices(final Method method, final Object[] objects, final MethodProxy methodProxy, final Object result) throws Throwable {
+        final List<Advice> advice = getTargetAdvice(method, objects);
+
         for (final Advice targetAdvice : advice) {
             if (targetAdvice instanceof final AfterReturningAdvice afterReturningAdvice) {
                 afterReturningAdvice.afterReturning(result, method, objects, methodProxy);
             }
         }
+    }
+
+    private List<Advice> getTargetAdvice(final Method method, final Object[] objects) {
+        return advisors.stream()
+                .filter(advisor -> advisor.getPointCut().getMethodMatcher().matches(method, clazz, objects))
+                .map(Advisor::getAdvice)
+                .toList();
     }
 }

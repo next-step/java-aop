@@ -36,7 +36,9 @@ class ProxyFactoryBeanTest {
     void beforeAdviceTest() {
         final ProxyFactoryBean<FakeClass> factoryBean = new ProxyFactoryBean<>(FakeClass.class);
         final FakeBeforeAdvice beforeAdvice = new FakeBeforeAdvice();
-        factoryBean.addAdvice(beforeAdvice);
+        final SayHelloPointCut pointCut = new SayHelloPointCut();
+        final DefaultAdvisor advisor = new DefaultAdvisor(beforeAdvice, pointCut);
+        factoryBean.addAdvisors(advisor);
 
         final FakeClass proxy = factoryBean.getObject();
         proxy.sayHello();
@@ -49,7 +51,9 @@ class ProxyFactoryBeanTest {
     void afterReturningAdviceTest() {
         final ProxyFactoryBean<FakeClass> factoryBean = new ProxyFactoryBean<>(FakeClass.class);
         final FakeAfterReturningAdvice afterReturningAdvice = new FakeAfterReturningAdvice();
-        factoryBean.addAdvice(afterReturningAdvice);
+        final SayHelloPointCut pointCut = new SayHelloPointCut();
+        final DefaultAdvisor advisor = new DefaultAdvisor(afterReturningAdvice, pointCut);
+        factoryBean.addAdvisors(advisor);
 
         final FakeClass proxy = factoryBean.getObject();
         proxy.sayHello();
@@ -57,9 +61,28 @@ class ProxyFactoryBeanTest {
         assertThat(afterReturningAdvice.isAfterCalled()).isTrue();
     }
 
+    @Test
+    @DisplayName("적절한 PointCut 이 없는 경우 Advice 가 호출되지 않는다.")
+    void pointCutMismatchTest() {
+        final ProxyFactoryBean<FakeClass> factoryBean = new ProxyFactoryBean<>(FakeClass.class);
+        final FakeBeforeAdvice beforeAdvice = new FakeBeforeAdvice();
+        final SayHelloPointCut pointCut = new SayHelloPointCut();
+        final DefaultAdvisor advisor = new DefaultAdvisor(beforeAdvice, pointCut);
+        factoryBean.addAdvisors(advisor);
+
+        final FakeClass proxy = factoryBean.getObject();
+        proxy.sayBye();
+
+        assertThat(beforeAdvice.isBeforeCalled()).isFalse();
+    }
+
     static class FakeClass {
         public String sayHello() {
             return "Hello";
+        }
+
+        public String sayBye() {
+            return "Bye";
         }
     }
 
@@ -86,6 +109,13 @@ class ProxyFactoryBeanTest {
 
         public boolean isAfterCalled() {
             return afterCalled;
+        }
+    }
+
+    static class SayHelloPointCut implements PointCut {
+        @Override
+        public MethodMatcher getMethodMatcher() {
+            return (method, targetClass, args) -> method.getName().equals("sayHello");
         }
     }
 }
