@@ -13,4 +13,6 @@ public interface MethodInvocation extends JoinPoint {
     Object getReturnValue();
 
     void setReturnValue(Object returnValue);
+
+    void setThrowable(Throwable ex);
 }

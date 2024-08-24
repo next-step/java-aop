@@ -33,4 +33,12 @@ public abstract class DataSourceUtils {
             throw new CannotGetJdbcConnectionException("Failed to close JDBC Connection");
         }
     }
+
+    public static void setReadOnly(DataSource dataSource, boolean readOnly) {
+        try {
+            getConnection(dataSource).setReadOnly(readOnly);
+        } catch (SQLException ex) {
+            throw new CannotGetJdbcConnectionException("Failed to set read-only flag for JDBC Connection", ex);
+        }
+    }
 }

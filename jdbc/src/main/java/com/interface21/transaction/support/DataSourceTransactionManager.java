@@ -48,4 +48,9 @@ public class DataSourceTransactionManager implements PlatformTransactionManager 
             TransactionSynchronizationManager.unbindResource(dataSource);
         }
     }
+
+    @Override
+    public DataSource getDataSource() {
+        return dataSource;
+    }
 }

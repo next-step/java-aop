@@ -30,6 +30,10 @@ public class Advisor {
         return advice instanceof AfterReturningAdvice;
     }
 
+    public boolean isAfterThrowingAdvice() {
+        return advice instanceof AfterThrowingAdvice;
+    }
+
     private boolean matches(Method method) {
         return pointCut.matches(method);
     }
