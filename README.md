@@ -179,3 +179,19 @@ public class SomeClass {
 - 재사용 가능한 FactoryBean
     - Proxy 가 추가될 때마다 공통적으로 사용할 수 있는 FactoryBean 이 있으면 좋겠다.
     - Target, Advice, PointCut 을 연결해 Proxy 를 생성하는 재사용 가능한 FactoryBean 을 추가한다.
+
+### 정리
+
+- ProxyFactoryBean
+    - Proxy 객체를 생성한다.
+    - 해당 Proxy 객체는 특정 시점의 전후 부가 로직을 Advisor 를 통해 추가할 수 있다.
+- MethodMatcher
+    - 특정 메서드가 Advice 의 적용 대상인지 여부를 판단한다.
+- PointCut
+    - MethodMatcher 통해 특정 시점에서 어떤 메서드가 선택할지 판단한다.
+- Advice
+    - 메서드 실행될 전 후 로직을 정의한다.
+    - MethodBeforeAdvice 는 메서드 실행 전 로직 정의
+    - AfterReturningAdvice 는 메서드가 실행 된 후 로직 정의
+- Advisor
+    - Advice 와 PointCut 을 가지고 어떤 Advice 를 언제 어디에 적용할지를 결정한다
