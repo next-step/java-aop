@@ -69,3 +69,8 @@ cligb를 구현할 때 스샷을 참고해서 아래 VM 옵션을 활성화한�
 ### 🚀 3단계 - @Transactional 구현하기
 - [x] : @Transactional 애노테이션을 사용하여 트랜잭션을 적용한다
 - [x] : FactoryBean을 사용하여 프록시를 생성하도록 만든다
+
+### 🚀 4단계 - ControllerAdvice, ExceptionHandler 구현하기
+- [ ] : @ControllerAdvice가 붙은 클래스를 스캔하여 빈으로 등록한다
+- [ ] : @ExceptionHandler가 붙어 있는 메서드를 찾아 Throwable 타입을 키, HandlerExecution 밸류로 맵핑한다
+- [ ] : DispatcherServlet에서 발생하는 예외를 HandlerExceptionResolver를 사용하여 처리한다
