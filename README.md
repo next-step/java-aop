@@ -67,5 +67,5 @@ cligb를 구현할 때 스샷을 참고해서 아래 VM 옵션을 활성화한�
 - [x] : 재사용 가능한 FactoryBean (Target, Advice, PointCut을 연결해 Proxy를 생성하는 재사용 가능한 FactoryBean을 추가)
 
 ### 🚀 3단계 - @Transactional 구현하기
-- [ ] : @Transactional 애노테이션을 사용하여 트랜잭션을 적용한다
-- [ ] : FactoryBean을 사용하여 프록시를 생성하도록 만든다
+- [x] : @Transactional 애노테이션을 사용하여 트랜잭션을 적용한다
+- [x] : FactoryBean을 사용하여 프록시를 생성하도록 만든다
