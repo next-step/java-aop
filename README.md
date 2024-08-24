@@ -141,6 +141,7 @@ public class JdkProxyTest {
 
 - 이 요구사항을 가장 쉽게 구현하려면 JDK Dynamic Proxy의 InvocationHandler와 cglib Proxy의 MethodInterceptor에서 하드코딩하면 된다.
 - 이와 같이 하드코딩하기보다 다음과 같이 Interface를 추가해 추상화해 본다.
+
 ```java
 import java.lang.reflect.Method;
 
@@ -148,3 +149,33 @@ public interface MethodMatcher {
     boolean matches(Method m, Class targetClass, Object[] args);
 }
 ```
+
+## 2단계 - Proxy 와 Bean 의존관계
+
+### 요구사항
+
+- Bean과 Proxy를 연결하도록 DI 컨테이너를 개선
+- DI 컨테이너의 Bean과 Proxy를 연결
+    - 자바 객체가 특정 interface를 구현하는 경우 빈을 생성할 때 예외 처리하도록 DI 컨테이너를 개선
+    - FactoryBean 인터페이스를 구현하는 Bean이 있다면 FactoryBean 구현체를 DI 컨테이너에 등록하지 않고, getObject() 메소드를 통해 반환되는 Bean을 DI 컨테이너에 등록
+
+```java
+public interface FactoryBean<T> {
+    T getObject() throws Exception;
+}
+
+public class SomeClass {
+
+    public Object someMethod() {
+        if (beanInstance instanceof FactoryBean) {
+            FactoryBean factory = (FactoryBean) beanInstance;
+            beanInstance = factory.getObject();
+        }
+        return beanInstance;
+    }
+}
+```
+
+- 재사용 가능한 FactoryBean
+    - Proxy 가 추가될 때마다 공통적으로 사용할 수 있는 FactoryBean 이 있으면 좋겠다.
+    - Target, Advice, PointCut 을 연결해 Proxy 를 생성하는 재사용 가능한 FactoryBean 을 추가한다.
