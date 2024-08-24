@@ -8,7 +8,7 @@ public class Target<T> {
         this.targetClass = targetClass;
     }
 
-    public Class<?> getTargetClass() {
+    public Class<T> getTargetClass() {
         return this.targetClass;
     }
 }
