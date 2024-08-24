@@ -29,6 +29,14 @@ public class ExceptionHandlerMapping {
                 .collect(Collectors.toMap(clazz -> clazz, applicationContext::getBean));
     }
 
+    public ExceptionHandlerExecution getHandler(Exception exception) throws Exception {
+        ExceptionHandlerKey handlerKey = new ExceptionHandlerKey(exception);
+        if (!handlerExecutions.containsKey(handlerKey)) {
+            throw exception;
+        }
+        return handlerExecutions.get(handlerKey);
+    }
+
     public Map<ExceptionHandlerKey, ExceptionHandlerExecution> getHandlerExecutions() {
         return handlerExecutions;
     }

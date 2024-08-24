@@ -17,4 +17,8 @@ public class ExceptionHandlerExecution {
     public ModelAndView handle(Exception exception) throws Exception {
         return (ModelAndView) method.invoke(declaredObject, exception);
     }
+
+    public Method getMethod() {
+        return method;
+    }
 }

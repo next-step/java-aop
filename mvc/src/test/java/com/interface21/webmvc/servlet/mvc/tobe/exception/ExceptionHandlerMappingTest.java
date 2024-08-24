@@ -9,6 +9,7 @@ import com.interface21.webmvc.servlet.view.JspView;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ExceptionHandlerMappingTest {
 
@@ -20,16 +21,33 @@ class ExceptionHandlerMappingTest {
         ExceptionHandlerMapping exceptionHandlerMapping = new ExceptionHandlerMapping(applicationContext, exceptionHandlerConverter);
         exceptionHandlerMapping.initialize();
         assertThat(exceptionHandlerMapping.getHandlerExecutions()).containsOnlyKeys(
-                new ExceptionHandlerKey(RuntimeException.class),
+                new ExceptionHandlerKey(IllegalStateException.class),
                 new ExceptionHandlerKey(IllegalArgumentException.class)
         );
+    }
+
+    @Test
+    void 예외에_맞는_핸들러를_못가져오는_경우_예외를_그대로_던진다() {
+        ExceptionHandlerMapping exceptionHandlerMapping = new ExceptionHandlerMapping(applicationContext, exceptionHandlerConverter);
+        exceptionHandlerMapping.initialize();
+        assertThatThrownBy(() -> exceptionHandlerMapping.getHandler(new IllegalAccessException()))
+                .isInstanceOf(IllegalAccessException.class);
+    }
+
+    @Test
+    void 예외에_해당하는_핸들러를_반환한다() throws Exception {
+        ExceptionHandlerMapping exceptionHandlerMapping = new ExceptionHandlerMapping(applicationContext, exceptionHandlerConverter);
+        exceptionHandlerMapping.initialize();
+
+        ExceptionHandlerExecution actual = exceptionHandlerMapping.getHandler(new IllegalArgumentException());
+        assertThat(actual.getMethod()).isEqualTo(TestControllerAdvice.class.getMethod("handleIllegalArgumentException"));
     }
 
     @ControllerAdvice
     public static class TestControllerAdvice {
 
-        @ExceptionHandler(RuntimeException.class)
-        public ModelAndView handleRuntimeException() {
+        @ExceptionHandler(IllegalStateException.class)
+        public ModelAndView handleIllegalStateException() {
             return new ModelAndView(new JspView("redirect:/index.jsp"));
         }
 

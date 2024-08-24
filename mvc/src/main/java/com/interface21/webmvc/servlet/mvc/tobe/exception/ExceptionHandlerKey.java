@@ -10,6 +10,10 @@ public class ExceptionHandlerKey {
         this.targetExceptionType = targetExceptionType;
     }
 
+    public ExceptionHandlerKey(Exception exception) {
+        this(exception.getClass());
+    }
+
     public boolean isMatch(Exception exception) {
         return targetExceptionType.isInstance(exception);
     }
