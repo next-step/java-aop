@@ -48,6 +48,10 @@ public class Advised {
         invokeAdvice(invocation, Advisor::isAfterReturningAdvice);
     }
 
+    public void afterThrowing(CglibMethodInvocation invocation) {
+        invokeAdvice(invocation, Advisor::isAfterThrowingAdvice);
+    }
+
     private void invokeAdvice(MethodInvocation invocation, Predicate<Advisor> filter) {
         advisors.stream()
             .filter(filter)
@@ -60,9 +64,5 @@ public class Advised {
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public void afterThrowing(CglibMethodInvocation invocation) {
-        invokeAdvice(invocation, Advisor::isAfterThrowingAdvice);
     }
 }
