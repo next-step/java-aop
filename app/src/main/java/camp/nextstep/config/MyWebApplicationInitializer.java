@@ -8,6 +8,8 @@ import com.interface21.webmvc.servlet.mvc.asis.ManualHandlerMapping;
 import com.interface21.webmvc.servlet.mvc.tobe.AnnotationHandlerMapping;
 import com.interface21.webmvc.servlet.mvc.tobe.HandlerConverter;
 import com.interface21.webmvc.servlet.mvc.tobe.HandlerExecutionHandlerAdapter;
+import com.interface21.webmvc.servlet.mvc.tobe.exception.ExceptionHandlerConverter;
+import com.interface21.webmvc.servlet.mvc.tobe.exception.ExceptionHandlerMapping;
 import jakarta.servlet.ServletContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +24,11 @@ public class MyWebApplicationInitializer implements WebApplicationInitializer {
         final var handlerConverter = applicationContext.getBean(HandlerConverter.class);
         final var annotationHandlerMapping = new AnnotationHandlerMapping(applicationContext, handlerConverter);
         annotationHandlerMapping.initialize();
+        final var exceptionHandlerConverter = applicationContext.getBean(ExceptionHandlerConverter.class);
+        final var exceptionHandlerMapping = new ExceptionHandlerMapping(applicationContext, exceptionHandlerConverter);
+        exceptionHandlerMapping.initialize();
 
-        final var dispatcherServlet = new DispatcherServlet();
+        final var dispatcherServlet = new DispatcherServlet(exceptionHandlerMapping);
         dispatcherServlet.addHandlerMapping(new ManualHandlerMapping());
         dispatcherServlet.addHandlerMapping(new AnnotationHandlerMapping(applicationContext, handlerConverter));
 

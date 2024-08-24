@@ -1,6 +1,7 @@
 package com.interface21.webmvc.servlet.mvc;
 
 import com.interface21.webmvc.servlet.ModelAndView;
+import com.interface21.webmvc.servlet.mvc.tobe.exception.ExceptionHandlerMapping;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,9 +18,12 @@ public class DispatcherServlet extends HttpServlet {
     private final HandlerAdapterRegistry handlerAdapterRegistry;
     private HandlerExecutor handlerExecutor;
 
-    public DispatcherServlet() {
+    private final ExceptionHandlerMapping exceptionHandlerMapping;
+
+    public DispatcherServlet(ExceptionHandlerMapping exceptionHandlerMapping) {
         this.handlerMappingRegistry = new HandlerMappingRegistry();
         this.handlerAdapterRegistry = new HandlerAdapterRegistry();
+        this.exceptionHandlerMapping = exceptionHandlerMapping;
     }
 
     @Override
