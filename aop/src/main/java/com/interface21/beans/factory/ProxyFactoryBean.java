@@ -33,19 +33,19 @@ public class ProxyFactoryBean<T> implements FactoryBean<T> {
 
     private MethodInterceptor createBeanMethodInterceptor() {
         return (o, method, objects, methodProxy) -> {
-            executeBeforeAdvices(method, objects, methodProxy);
+            final List<Advice> advice = getTargetAdvice(method, objects);
+
+            executeBeforeAdvices(advice, method, objects, methodProxy);
 
             final Object result = methodProxy.invokeSuper(o, objects);
 
-            executeAfterReturningAdvices(method, objects, methodProxy, result);
+            executeAfterAdvices(advice, method, objects, methodProxy, result);
 
             return result;
         };
     }
 
-    private void executeBeforeAdvices(final Method method, final Object[] objects, final MethodProxy methodProxy) throws Throwable {
-        final List<Advice> advice = getTargetAdvice(method, objects);
-
+    private void executeBeforeAdvices(final List<Advice> advice, final Method method, final Object[] objects, final MethodProxy methodProxy) throws Throwable {
         for (final Advice targetAdvice : advice) {
             if (targetAdvice instanceof final MethodBeforeAdvice methodBeforeAdvice) {
                 methodBeforeAdvice.before(method, objects, methodProxy);
@@ -53,9 +53,7 @@ public class ProxyFactoryBean<T> implements FactoryBean<T> {
         }
     }
 
-    private void executeAfterReturningAdvices(final Method method, final Object[] objects, final MethodProxy methodProxy, final Object result) throws Throwable {
-        final List<Advice> advice = getTargetAdvice(method, objects);
-
+    private void executeAfterAdvices(final List<Advice> advice, final Method method, final Object[] objects, final MethodProxy methodProxy, final Object result) throws Throwable {
         for (final Advice targetAdvice : advice) {
             if (targetAdvice instanceof final AfterReturningAdvice afterReturningAdvice) {
                 afterReturningAdvice.afterReturning(result, method, objects, methodProxy);
