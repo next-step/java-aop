@@ -9,15 +9,15 @@ import com.interface21.context.stereotype.Service;
 import com.interface21.transaction.annotation.Transactional;
 
 @Service
-public class AppUserService {
+public class FakeUserService {
 
     private final UserDao userDao;
     private final UserHistoryDao userHistoryDao;
 
     @Autowired
-    public AppUserService(final UserDao userDao, final UserHistoryDao userHistoryDao) {
+    public FakeUserService(UserDao userDao) {
         this.userDao = userDao;
-        this.userHistoryDao = userHistoryDao;
+        this.userHistoryDao = new StubUserHistoryDao(null);
     }
 
     public User findByAccount(final String account) {

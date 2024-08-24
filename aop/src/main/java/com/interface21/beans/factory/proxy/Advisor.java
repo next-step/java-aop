@@ -2,6 +2,8 @@ package com.interface21.beans.factory.proxy;
 
 import net.sf.cglib.proxy.MethodInterceptor;
 
+import java.lang.reflect.Method;
+
 public class Advisor {
 
     private final PointCut pointCut;
@@ -10,6 +12,10 @@ public class Advisor {
     public Advisor(PointCut pointCut, Advice advice) {
         this.pointCut = pointCut;
         this.advice = advice;
+    }
+
+    public boolean matches(Method method) {
+        return pointCut.matches(method);
     }
 
     public MethodInterceptor createMethodInterceptor() {

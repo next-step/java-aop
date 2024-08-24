@@ -99,3 +99,18 @@ cligb를 구현할 때 스샷을 참고해서 아래 VM 옵션을 활성화한�
   - invoke 호출 시 joinPoint를 실행하고 이후 정의된 afterReturning을 실행한다
 - BeforeAdvice
   - invoke 호출 전 정의된 before를 실행하고 이후 joinPoint를 실행한다
+
+## 3단계 - @Transactional 구현하기
+- Transcation Aop 처리(TransactionAdvice)
+  - Transactional어노테이션이 클래스레벨 혹은 메소드 레벨에 붙어있는 경우 PointCut 대상이 된다
+  - joinPoint 실행 앞뒤로 트랜잭션처리를 한다
+    - advice는 PlatformTransactionManager를 가지며 실행 후 rollback 혹은 commit 처리를 할 수 있다
+
+- BeanPostProcessor
+  - bean이 해당 processor를 실행가능한지 여부를 판단한다
+  - bean이 하나의 BeanPostProcessor가 처리가능한 경우 예외를 던진다
+  - bean을 받아 postInitialization 처리를 실행한다
+  - TransactionBeanPostProcessor
+    - Transactional이 걸린 bean을 받아 Transaction처리가 가능한 porxy object를 반환한다
+- ProxyFactoryBean
+  - Enhancer proxy 생성 시 bean의 생성자에 맞는 bean을 beanFactory에 주입하여 프록시객체를 생성한다
