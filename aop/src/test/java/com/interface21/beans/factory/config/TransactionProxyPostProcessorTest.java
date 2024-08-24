@@ -56,6 +56,16 @@ class TransactionProxyPostProcessorTest {
         assertFalse(service instanceof ProxyFactoryBean);
     }
 
+    @DisplayName("트랜잭션어노테이션이 메서드에 한개라도 포함된 경우 프록시 생성")
+    @Test
+    void testPostInitialization_TransactionalAnyMethod() {
+        TransactionalAnyMethodService transactionalAnyMethodService = new TransactionalAnyMethodService();
+
+        Object service = processor.postInitialization(transactionalAnyMethodService);
+
+        assertTrue(service instanceof ProxyFactoryBean);
+    }
+
     @Transactional
     public static class TransactionalService {
         public void performTransaction() {
@@ -65,6 +75,14 @@ class TransactionProxyPostProcessorTest {
     public static class TransactionalMethodService {
         @Transactional
         public void performAction() {
+        }
+    }
+
+    public static class TransactionalAnyMethodService {
+        @Transactional
+        public void performAction() {
+        }
+        public void performAction2() {
         }
     }
 
