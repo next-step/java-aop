@@ -45,6 +45,17 @@ public class HandlerExecution {
         return (ModelAndView) method.invoke(declaredObject, arguments);
     }
 
+    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Throwable e) throws Exception {
+        MethodParameter[] methodParameters = getMethodParameters();
+        Object[] arguments = new Object[methodParameters.length];
+
+        for (int i = 0; i < methodParameters.length; i++) {
+            arguments[i] = getArguments(methodParameters[i], request, response, e);
+        }
+
+        return (ModelAndView) method.invoke(declaredObject, arguments);
+    }
+
     private MethodParameter[] getMethodParameters() {
         MethodParameter[] methodParameters = methodParameterCache.get(method);
 
@@ -67,6 +78,20 @@ public class HandlerExecution {
     }
 
     private Object getArguments(MethodParameter methodParameter, HttpServletRequest request, HttpServletResponse response) {
+        for (HandlerMethodArgumentResolver resolver : argumentResolver) {
+            if (resolver.supportsParameter(methodParameter)) {
+                return resolver.resolveArgument(methodParameter, request, response);
+            }
+        }
+
+        throw new IllegalStateException("No suitable resolver for argument: " + methodParameter.getType());
+    }
+
+    private Object getArguments(MethodParameter methodParameter, HttpServletRequest request, HttpServletResponse response, Throwable e) {
+        if (methodParameter.getType().isAssignableFrom(e.getClass())) {
+            return e;
+        }
+
         for (HandlerMethodArgumentResolver resolver : argumentResolver) {
             if (resolver.supportsParameter(methodParameter)) {
                 return resolver.resolveArgument(methodParameter, request, response);
