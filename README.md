@@ -67,3 +67,19 @@ cligb를 구현할 때 스샷을 참고해서 아래 VM 옵션을 활성화한�
 - [x] JDK Dynamic Proxy로 구현하기 
 - [x] CGLIB 으로 구현하기 
 - [x] say로 시작하는 메서드에 한해서만 메서드의 반환 값을 대문자로 변환하기 
+
+## 🚀 2단계 - Proxy와 Bean 의존관계
+### DI 컨테이너의 Bean과 Proxy를 연결하기
+자바 객체가 특정 interface를 구현한 경우 빈을 생성할 때 예외 처리를 할 수 있도록 DI 컨테이너를 개선한다
+```java
+public interface FactoryBean<T> {
+    T getObject() throws Exception;
+}
+```
+- [] FactoryBean 인터페이스를 구현하는 Bean은 구현체를 DI에 등록하는게 아니고, `getObject()`메서드가 반환하는 Bean을 등록해야 한다 
+  - `getObject()`가 반환하는 Bean = 프록시 객체 
+
+
+### 재사용 가능한 FactoryBean 만들기
+Proxy가 추가될 때 마다 FactoryBean을 생성하는 것은 귀찮은 일이다. 공통으로 사용될만한 FactoryBean을 만들자 
+- [] Target, Advice, PointCut을 연결해 Proxy를 생성하는 재사용 가능한 FactoryBean 추가하기 
