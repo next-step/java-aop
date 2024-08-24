@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.InvocationTargetException;
+
 public class DispatcherServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -53,19 +55,21 @@ public class DispatcherServlet extends HttpServlet {
 
             final var modelAndView = handlerExecutor.handle(request, response, handler.get());
             render(modelAndView, request, response);
+        } catch (InvocationTargetException e) {
+            handleException(request, response, e.getTargetException());
         } catch (Exception e) {
             handleException(request, response, e);
         }
     }
 
-    private void handleException(HttpServletRequest request, HttpServletResponse response, Exception e) throws ServletException {
+    private void handleException(HttpServletRequest request, HttpServletResponse response, Throwable e) throws ServletException {
         log.error("Exception : {}", e.getMessage(), e);
 
         try {
             ExceptionHandlerExecution exceptionHandlerExecution = exceptionHandlerMapping.getHandler(e);
             ModelAndView modelAndView = exceptionHandlerExecution.handle(e);
             render(modelAndView, request, response);
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             throw new ServletException(ex.getMessage());
         }
     }

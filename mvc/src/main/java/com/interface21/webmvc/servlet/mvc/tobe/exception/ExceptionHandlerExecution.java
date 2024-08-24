@@ -14,8 +14,9 @@ public class ExceptionHandlerExecution {
         this.method = method;
     }
 
-    public ModelAndView handle(Exception exception) throws Exception {
-        return (ModelAndView) method.invoke(declaredObject, exception);
+    public ModelAndView handle(Throwable exception) throws Exception {
+        // todo resolver 추가
+        return (ModelAndView) method.invoke(declaredObject);
     }
 
     public Method getMethod() {

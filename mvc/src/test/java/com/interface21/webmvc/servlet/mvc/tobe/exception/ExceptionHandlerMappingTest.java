@@ -36,7 +36,7 @@ class ExceptionHandlerMappingTest {
     }
 
     @Test
-    void 예외에_해당하는_핸들러를_반환한다() throws Exception {
+    void 예외에_해당하는_핸들러를_반환한다() throws Throwable {
         ExceptionHandlerMapping exceptionHandlerMapping = new ExceptionHandlerMapping(applicationContext, exceptionHandlerConverter);
         exceptionHandlerMapping.initialize();
 

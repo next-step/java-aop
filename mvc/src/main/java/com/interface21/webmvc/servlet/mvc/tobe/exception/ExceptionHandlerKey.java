@@ -4,13 +4,13 @@ import java.util.Objects;
 
 public class ExceptionHandlerKey {
 
-    private final Class<? extends Exception> targetExceptionType;
+    private final Class<? extends Throwable> targetExceptionType;
 
-    public ExceptionHandlerKey(Class<? extends Exception> targetExceptionType) {
+    public ExceptionHandlerKey(Class<? extends Throwable> targetExceptionType) {
         this.targetExceptionType = targetExceptionType;
     }
 
-    public ExceptionHandlerKey(Exception exception) {
+    public ExceptionHandlerKey(Throwable exception) {
         this(exception.getClass());
     }
 
