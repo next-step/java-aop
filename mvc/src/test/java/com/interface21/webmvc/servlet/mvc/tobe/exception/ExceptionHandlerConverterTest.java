@@ -2,6 +2,7 @@ package com.interface21.webmvc.servlet.mvc.tobe.exception;
 
 import com.interface21.context.stereotype.ControllerAdvice;
 import com.interface21.webmvc.servlet.ModelAndView;
+import com.interface21.webmvc.servlet.mvc.tobe.HandlerExecution;
 import com.interface21.webmvc.servlet.view.JspView;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +16,7 @@ class ExceptionHandlerConverterTest {
     void ExceptionHandler어노테이션이_붙은_메소드로_handler를_세팅한다() {
         ExceptionHandlerConverter converter = new ExceptionHandlerConverter();
 
-        Map<ExceptionHandlerKey, ExceptionHandlerExecution> actual = converter.convert(
+        Map<ExceptionHandlerKey, HandlerExecution> actual = converter.convert(
                 Map.of(TestControllerAdvice.class, new TestControllerAdvice())
         );
         assertThat(actual).containsOnlyKeys(

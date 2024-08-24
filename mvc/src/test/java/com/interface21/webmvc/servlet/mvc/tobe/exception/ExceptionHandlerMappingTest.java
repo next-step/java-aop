@@ -6,6 +6,7 @@ import com.interface21.context.annotation.Configuration;
 import com.interface21.context.stereotype.ControllerAdvice;
 import com.interface21.context.support.AnnotationConfigWebApplicationContext;
 import com.interface21.webmvc.servlet.ModelAndView;
+import com.interface21.webmvc.servlet.mvc.tobe.HandlerExecution;
 import com.interface21.webmvc.servlet.view.JspView;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +41,7 @@ class ExceptionHandlerMappingTest {
         ExceptionHandlerMapping exceptionHandlerMapping = new ExceptionHandlerMapping(applicationContext, exceptionHandlerConverter);
         exceptionHandlerMapping.initialize();
 
-        ExceptionHandlerExecution actual = exceptionHandlerMapping.getHandler(new IllegalArgumentException());
+        HandlerExecution actual = exceptionHandlerMapping.getHandler(new IllegalArgumentException());
         assertThat(actual.getMethod()).isEqualTo(TestControllerAdvice.class.getMethod("handleIllegalArgumentException"));
     }
 

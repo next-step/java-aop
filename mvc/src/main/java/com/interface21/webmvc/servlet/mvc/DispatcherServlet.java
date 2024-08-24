@@ -1,7 +1,7 @@
 package com.interface21.webmvc.servlet.mvc;
 
 import com.interface21.webmvc.servlet.ModelAndView;
-import com.interface21.webmvc.servlet.mvc.tobe.exception.ExceptionHandlerExecution;
+import com.interface21.webmvc.servlet.mvc.tobe.HandlerExecution;
 import com.interface21.webmvc.servlet.mvc.tobe.exception.ExceptionHandlerMapping;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -66,8 +66,9 @@ public class DispatcherServlet extends HttpServlet {
         log.error("Exception : {}", e.getMessage(), e);
 
         try {
-            ExceptionHandlerExecution exceptionHandlerExecution = exceptionHandlerMapping.getHandler(e);
-            ModelAndView modelAndView = exceptionHandlerExecution.handle(e);
+            HandlerExecution exceptionHandlerExecution = exceptionHandlerMapping.getHandler(e);
+            request.setAttribute("exception", e);
+            ModelAndView modelAndView = exceptionHandlerExecution.handle(request, response);
             render(modelAndView, request, response);
         } catch (Throwable ex) {
             throw new ServletException(ex.getMessage());

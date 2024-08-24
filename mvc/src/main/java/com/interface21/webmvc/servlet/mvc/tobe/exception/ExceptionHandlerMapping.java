@@ -2,6 +2,7 @@ package com.interface21.webmvc.servlet.mvc.tobe.exception;
 
 import com.interface21.context.ApplicationContext;
 import com.interface21.context.stereotype.ControllerAdvice;
+import com.interface21.webmvc.servlet.mvc.tobe.HandlerExecution;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +12,7 @@ public class ExceptionHandlerMapping {
 
     private final ApplicationContext applicationContext;
     private final ExceptionHandlerConverter exceptionHandlerConverter;
-    private final Map<ExceptionHandlerKey, ExceptionHandlerExecution> handlerExecutions = new HashMap<>();
+    private final Map<ExceptionHandlerKey, HandlerExecution> handlerExecutions = new HashMap<>();
 
     public ExceptionHandlerMapping(ApplicationContext applicationContext, ExceptionHandlerConverter exceptionHandlerConverter) {
         this.applicationContext = applicationContext;
@@ -30,7 +31,7 @@ public class ExceptionHandlerMapping {
                 .collect(Collectors.toMap(clazz -> clazz, applicationContext::getBean));
     }
 
-    public ExceptionHandlerExecution getHandler(Throwable exception) throws Throwable {
+    public HandlerExecution getHandler(Throwable exception) throws Throwable {
         ExceptionHandlerKey handlerKey = new ExceptionHandlerKey(exception);
         if (!handlerExecutions.containsKey(handlerKey)) {
             throw exception;
@@ -38,7 +39,7 @@ public class ExceptionHandlerMapping {
         return handlerExecutions.get(handlerKey);
     }
 
-    public Map<ExceptionHandlerKey, ExceptionHandlerExecution> getHandlerExecutions() {
+    public Map<ExceptionHandlerKey, HandlerExecution> getHandlerExecutions() {
         return handlerExecutions;
     }
 }

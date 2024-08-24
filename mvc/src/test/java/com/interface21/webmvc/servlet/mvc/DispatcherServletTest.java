@@ -75,6 +75,10 @@ class DispatcherServletTest {
         when(request.getRequestURI()).thenReturn("/api/fail");
         when(request.getMethod()).thenReturn("GET");
         when(request.getRequestDispatcher("/index.jsp")).thenReturn(requestDispatcher);
+        IllegalArgumentException exception = new IllegalArgumentException();
+        when(request.getAttribute("exception")).thenReturn(exception);
+        doNothing().when(request).setAttribute("exception", exception);
+
         doNothing().when(response).sendRedirect("/index.jsp");
         doNothing().when(requestDispatcher).forward(request, response);
 
