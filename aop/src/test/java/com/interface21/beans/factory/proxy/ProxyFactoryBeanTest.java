@@ -1,6 +1,5 @@
 package com.interface21.beans.factory.proxy;
 
-import com.interface21.framework.AopProxy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
@@ -8,19 +7,37 @@ import org.mockito.InOrder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 class ProxyFactoryBeanTest {
+
+    @DisplayName("target 클래스의 타입을 반환 한다")
+    @Test
+    public void getObjectType() throws Exception {
+        // given
+        final ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean();
+        proxyFactoryBean.setTargetClass(new TypeTarget<>(TargetBean.class));
+
+        // when
+        final Class<?> actual = proxyFactoryBean.getObjectType();
+
+        // then
+        assertThat(actual).isEqualTo(TargetBean.class);
+    }
 
     @DisplayName("target 클래스를 주입 받아 해당 클래스 타입의 프록시를 생성 한다")
     @Test
     public void getObject() throws Exception {
         // given
-        final ProxyFactoryBean<AopProxy, TargetBean> proxyFactoryBean = new ProxyFactoryBean<>();
-        proxyFactoryBean.setTargetClass(new Target<>(TargetBean.class));
+        final ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean();
+        proxyFactoryBean.setTargetClass(new TypeTarget<>(TargetBean.class));
 
         // when
-        final TargetBean actual = (TargetBean) proxyFactoryBean.getObject().getProxy();
+        final TargetBean actual = (TargetBean) proxyFactoryBean.getObject();
 
         // then
         assertThat(actual).isInstanceOf(TargetBean.class);
@@ -30,9 +47,9 @@ class ProxyFactoryBeanTest {
     @Test
     public void invokeProxyMethodWithoutAdvisor() throws Exception {
         // given
-        final ProxyFactoryBean<AopProxy, TargetBean> proxyFactoryBean = new ProxyFactoryBean<>();
-        proxyFactoryBean.setTargetClass(new Target<>(TargetBean.class));
-        final TargetBean proxy = (TargetBean) proxyFactoryBean.getObject().getProxy();
+        final ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean();
+        proxyFactoryBean.setTargetClass(new TypeTarget<>(TargetBean.class));
+        final TargetBean proxy = (TargetBean) proxyFactoryBean.getObject();
 
         // when then
         assertDoesNotThrow(() -> proxy.hello());
@@ -42,14 +59,14 @@ class ProxyFactoryBeanTest {
     @Test
     public void invokeProxyMethodWithMethodBeforeAdvice() throws Throwable {
         // given
-        final ProxyFactoryBean<AopProxy, TargetBean> proxyFactoryBean = new ProxyFactoryBean<>();
-        proxyFactoryBean.setTargetClass(new Target<>(TargetBean.class));
+        final ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean();
+        proxyFactoryBean.setTargetClass(new TypeTarget<>(TargetBean.class));
         final MethodBeforeAdvice beforeAdvice1 = mock();
         final MethodBeforeAdvice beforeAdvice2 = mock();
         final Advisor advisor1 = new Advisor(beforeAdvice1);
         final Advisor advisor2 = new Advisor(beforeAdvice2);
         proxyFactoryBean.addAdvisors(advisor1, advisor2);
-        final TargetBean proxy = (TargetBean) proxyFactoryBean.getObject().getProxy();
+        final TargetBean proxy = (TargetBean) proxyFactoryBean.getObject();
 
         // when
         proxy.hello();
@@ -65,14 +82,14 @@ class ProxyFactoryBeanTest {
     @Test
     public void invokeProxyMethodWithAfterRunningAdvice() throws Throwable {
         // given
-        final ProxyFactoryBean<AopProxy, TargetBean> proxyFactoryBean = new ProxyFactoryBean<>();
-        proxyFactoryBean.setTargetClass(new Target<>(TargetBean.class));
+        final ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean();
+        proxyFactoryBean.setTargetClass(new TypeTarget<>(TargetBean.class));
         final AfterReturningAdvice afterAdvice1 = mock();
         final AfterReturningAdvice afterAdvice2 = mock();
         final Advisor advisor1 = new Advisor(afterAdvice1);
         final Advisor advisor2 = new Advisor(afterAdvice2);
         proxyFactoryBean.addAdvisors(advisor1, advisor2);
-        final TargetBean proxy = (TargetBean) proxyFactoryBean.getObject().getProxy();
+        final TargetBean proxy = (TargetBean) proxyFactoryBean.getObject();
 
         // when
         proxy.hello();
@@ -88,15 +105,15 @@ class ProxyFactoryBeanTest {
     @Test
     public void invokeProxyMethodWithNotMatchAdvice() throws Throwable {
         // given
-        final ProxyFactoryBean<AopProxy, TargetBean> proxyFactoryBean = new ProxyFactoryBean<>();
-        proxyFactoryBean.setTargetClass(new Target<>(TargetBean.class));
+        final ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean();
+        proxyFactoryBean.setTargetClass(new TypeTarget<>(TargetBean.class));
         final Pointcut falsePointcut = (method, targetClass) -> false;
         final AfterReturningAdvice advice1 = mock();
         final AfterReturningAdvice advice2 = mock();
         final Advisor advisor1 = new Advisor(advice1, falsePointcut);
         final Advisor advisor2 = new Advisor(advice2, falsePointcut);
         proxyFactoryBean.addAdvisors(advisor1, advisor2);
-        final TargetBean proxy = (TargetBean) proxyFactoryBean.getObject().getProxy();
+        final TargetBean proxy = (TargetBean) proxyFactoryBean.getObject();
 
         // when
         proxy.hello();
@@ -112,14 +129,14 @@ class ProxyFactoryBeanTest {
     @Test
     public void invokeAdviceOrder() throws Throwable {
         // given
-        final ProxyFactoryBean<AopProxy, TargetBean> proxyFactoryBean = new ProxyFactoryBean<>();
-        proxyFactoryBean.setTargetClass(new Target<>(TargetBean.class));
+        final ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean();
+        proxyFactoryBean.setTargetClass(new TypeTarget<>(TargetBean.class));
         final MethodBeforeAdvice beforeAdvice = mock();
         final AfterReturningAdvice afterAdvice = mock();
         final Advisor advisor1 = new Advisor(beforeAdvice);
         final Advisor advisor2 = new Advisor(afterAdvice);
         proxyFactoryBean.addAdvisors(advisor1, advisor2);
-        final TargetBean proxy = (TargetBean) proxyFactoryBean.getObject().getProxy();
+        final TargetBean proxy = (TargetBean) proxyFactoryBean.getObject();
 
         // when
         proxy.hello();
