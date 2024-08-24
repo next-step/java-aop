@@ -16,4 +16,12 @@ class HelloTarget implements Hello {
     public String pingPong(String name) {
         return "Ping Pong " + name;
     }
+
+    public String doSay(final String name) {
+        return name;
+    }
+
+    public String doSayYesOrNo() {
+        return "yes";
+    }
 }
