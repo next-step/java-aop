@@ -1,5 +1,7 @@
 package com.interface21.transaction;
 
+import javax.sql.DataSource;
+
 public interface PlatformTransactionManager {
 
     void begin();
@@ -7,4 +9,6 @@ public interface PlatformTransactionManager {
     void commit();
 
     void rollback();
+
+    DataSource getDataSource();
 }

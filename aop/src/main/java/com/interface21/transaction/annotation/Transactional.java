@@ -7,4 +7,6 @@ import java.lang.annotation.*;
 @Inherited
 @Documented
 public @interface Transactional {
+
+    boolean readOnly() default false;
 }
