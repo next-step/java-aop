@@ -65,10 +65,10 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         return (T) bean;
     }
 
-    private Object unwrapIfNecessary(Object beanInstance) {
+    private Object unwrapIfNecessary(final Object beanInstance) {
         if (beanInstance instanceof final FactoryBean<?> factoryBean) {
             try {
-                beanInstance = factoryBean.getObject();
+                return factoryBean.getObject();
             } catch (final Exception e) {
                 log.error(e.getMessage());
                 throw new BeanInstantiationException(beanInstance.getClass(), e.getMessage());
