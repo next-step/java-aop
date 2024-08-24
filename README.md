@@ -114,3 +114,15 @@ cligb를 구현할 때 스샷을 참고해서 아래 VM 옵션을 활성화한�
     - Transactional이 걸린 bean을 받아 Transaction처리가 가능한 porxy object를 반환한다
 - ProxyFactoryBean
   - Enhancer proxy 생성 시 bean의 생성자에 맞는 bean을 beanFactory에 주입하여 프록시객체를 생성한다
+
+## 4단계 - ControllerAdvice, ExceptionHandler 구현하기
+- Exeception이 발생하면 Exception을 처리하는 Handler가 해당 처리를 진행한다.
+- ExceptionHandlerMapping
+  - ControllerAdvice를 가진 bean을 모두 받는다
+  - ExceptionHandlerConverter를 통해 컨버팅된 ExceptionHandlerExecution을 저장한다.
+  - 특정 처리가능한 예외를 받아 handler를 반환할 수 있다.
+- ExceptionHandlerConverter
+  - ExceptionHandler 어노테이션이 달린 메소드를 처리한다
+  - Key: Exception, Value: ExceptionHandlerExecution으로 저장한다
+- HandlerExceptionResolver
+  - Exception을 처리한다
