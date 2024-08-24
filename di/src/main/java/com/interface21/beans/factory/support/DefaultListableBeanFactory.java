@@ -1,7 +1,9 @@
 package com.interface21.beans.factory.support;
 
+import com.interface21.beans.BeanInstantiationException;
 import com.interface21.beans.BeanUtils;
 import com.interface21.beans.factory.ConfigurableListableBeanFactory;
+import com.interface21.beans.factory.FactoryBean;
 import com.interface21.beans.factory.config.BeanDefinition;
 import com.interface21.context.annotation.AnnotatedBeanDefinition;
 import jakarta.annotation.PostConstruct;
@@ -11,7 +13,12 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 public class DefaultListableBeanFactory implements BeanDefinitionRegistry, ConfigurableListableBeanFactory {
 
@@ -44,7 +51,7 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         BeanDefinition beanDefinition = beanDefinitions.get(clazz);
         if (beanDefinition instanceof AnnotatedBeanDefinition) {
             Optional<Object> optionalBean = createAnnotatedBean(beanDefinition);
-            optionalBean.ifPresent(b -> beans.put(clazz, b));
+            optionalBean.ifPresent(b -> registerBean(clazz, b));
             initialize(bean, clazz);
             return (T) optionalBean.orElse(null);
         }
@@ -57,9 +64,22 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         beanDefinition = beanDefinitions.get(concreteClazz.get());
         log.debug("BeanDefinition : {}", beanDefinition);
         bean = inject(beanDefinition);
-        beans.put(concreteClazz.get(), bean);
+        registerBean(concreteClazz.get(), bean);
         initialize(bean, concreteClazz.get());
         return (T) bean;
+    }
+
+
+    private void registerBean(final Class<?> clazz, Object bean) {
+        if (bean instanceof FactoryBean<?> factoryBean) {
+            try {
+                beans.put(factoryBean.getObjectType(), factoryBean.getObject());
+            } catch (Exception e) {
+                throw new BeanInstantiationException(bean.getClass(), e.getMessage());
+            }
+        }
+
+        beans.put(clazz, bean);
     }
 
     private void initialize(Object bean, Class<?> beanClass) {
