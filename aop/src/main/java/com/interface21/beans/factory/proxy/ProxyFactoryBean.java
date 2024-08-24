@@ -2,20 +2,19 @@ package com.interface21.beans.factory.proxy;
 
 import com.interface21.beans.factory.FactoryBean;
 import com.interface21.framework.CglibAopProxy;
-import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProxyFactoryBean<T, S> implements FactoryBean<T> {
+public class ProxyFactoryBean implements FactoryBean<Object> {
 
-    private Target<S> targetClass;
+    private TypeTarget<?> typeTarget;
     private final List<Advisor> advisors = new ArrayList<>();
 
-    public void setTargetClass(final Target<S> targetClass) {
-        this.targetClass = targetClass;
+    public void setTargetClass(final TypeTarget<?> typeTarget) {
+        this.typeTarget = typeTarget;
     }
 
     public void addAdvisors(final Advisor... advisors) {
@@ -23,16 +22,19 @@ public class ProxyFactoryBean<T, S> implements FactoryBean<T> {
     }
 
     @Override
-    public T getObject() throws Exception {
+    public Object getObject() throws Exception {
         final MethodInterceptor methodInterceptor = createMethodInterceptor();
 
-        final Object aopProxy = Enhancer.create(targetClass.getTargetClass(), methodInterceptor);
+        return new CglibAopProxy(typeTarget.getTargetClass(), methodInterceptor).getProxy();
+    }
 
-        return (T) new CglibAopProxy(aopProxy);
+    @Override
+    public Class<?> getObjectType() {
+        return typeTarget.getTargetClass();
     }
 
     private MethodInterceptor createMethodInterceptor() {
-        final Class<?> clazz = targetClass.getTargetClass();
+        final Class<?> clazz = typeTarget.getTargetClass();
 
         return (o, method, objects, methodProxy) -> {
             final List<Advice> matchedAdvices = this.advisors.stream().filter(advisor -> advisor.getPointcut().matches(method, clazz)).map(Advisor::getAdvice).toList();
