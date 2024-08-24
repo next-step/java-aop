@@ -1,9 +1,9 @@
 package com.interface21.transaction;
 
-import com.interface21.framework.BeforeAdvice;
+import com.interface21.framework.AfterReturningAdvice;
 import com.interface21.framework.MethodInvocation;
 
-public class TransactionAfterReturningAdvice implements BeforeAdvice {
+public class TransactionAfterReturningAdvice implements AfterReturningAdvice {
 
     PlatformTransactionManager platformTransactionManager;
 
