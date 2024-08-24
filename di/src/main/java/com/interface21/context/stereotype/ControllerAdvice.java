@@ -1,6 +1,4 @@
-package com.interface21.webmvc.servlet.mvc.tobe.exception;
-
-import com.interface21.context.stereotype.Component;
+package com.interface21.context.stereotype;
 
 import java.lang.annotation.*;
 
