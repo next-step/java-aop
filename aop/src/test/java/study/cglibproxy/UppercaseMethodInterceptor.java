@@ -3,7 +3,7 @@ package study.cglibproxy;
 import java.lang.reflect.Method;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
-import study.MethodMatcher;
+import com.interface21.beans.factory.MethodMatcher;
 
 public class UppercaseMethodInterceptor implements MethodInterceptor {
     private final MethodMatcher methodMatcher;
