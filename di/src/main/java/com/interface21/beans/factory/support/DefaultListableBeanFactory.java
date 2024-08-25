@@ -4,6 +4,7 @@ import com.interface21.beans.BeanUtils;
 import com.interface21.beans.factory.ConfigurableListableBeanFactory;
 import com.interface21.beans.factory.FactoryBean;
 import com.interface21.beans.factory.config.BeanDefinition;
+import com.interface21.beans.factory.config.BeanPostProcessor;
 import com.interface21.context.annotation.AnnotatedBeanDefinition;
 import jakarta.annotation.PostConstruct;
 import java.lang.reflect.Constructor;
@@ -11,6 +12,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,6 +24,7 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
 
     private static final Logger log = LoggerFactory.getLogger(DefaultListableBeanFactory.class);
 
+    private final Set<BeanPostProcessor> beanPostProcessors = new HashSet<>();
     private final Map<Class<?>, Object> beans = new HashMap<>();
 
     private final Map<Class<?>, BeanDefinition> beanDefinitions = new HashMap<>();
@@ -72,9 +75,17 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
             }
         }
 
+        bean = postProcessBean(bean);
         beans.put(concreteClazz.get(), bean);
         initialize(bean, concreteClazz.get());
         return (T) bean;
+    }
+
+    private Object postProcessBean(Object bean) {
+        for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
+            bean = beanPostProcessor.postInitialization(bean);
+        }
+        return bean;
     }
 
     private void initialize(Object bean, Class<?> beanClass) {
@@ -154,5 +165,9 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
     public void registerBeanDefinition(Class<?> clazz, BeanDefinition beanDefinition) {
         log.debug("register bean : {}", clazz);
         beanDefinitions.put(clazz, beanDefinition);
+    }
+
+    public void addBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
+        beanPostProcessors.add(beanPostProcessor);
     }
 }

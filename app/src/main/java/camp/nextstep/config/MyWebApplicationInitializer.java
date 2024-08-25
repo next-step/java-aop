@@ -1,6 +1,8 @@
 package camp.nextstep.config;
 
+import com.interface21.beans.factory.config.TransactionProxyBeanPostProcessor;
 import com.interface21.context.support.AnnotationConfigWebApplicationContext;
+import com.interface21.transaction.PlatformTransactionManager;
 import com.interface21.web.WebApplicationInitializer;
 import com.interface21.webmvc.servlet.mvc.DispatcherServlet;
 import com.interface21.webmvc.servlet.mvc.asis.ControllerHandlerAdapter;
@@ -33,6 +35,9 @@ public class MyWebApplicationInitializer implements WebApplicationInitializer {
         final var dispatcher = container.addServlet("dispatcher", dispatcherServlet);
         dispatcher.setLoadOnStartup(1);
         dispatcher.addMapping("/");
+
+        final var platformTransactionManager = applicationContext.getBean(PlatformTransactionManager.class);
+        applicationContext.addBeanPostProcessor(new TransactionProxyBeanPostProcessor(platformTransactionManager));
 
         log.info("Start AppWebApplication Initializer");
     }
