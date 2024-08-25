@@ -7,6 +7,7 @@ import com.interface21.jdbc.core.JdbcTemplate;
 import com.interface21.transaction.PlatformTransactionManager;
 import com.interface21.transaction.support.DataSourceTransactionManager;
 import com.interface21.web.method.support.HandlerMethodArgumentResolver;
+import com.interface21.webmvc.servlet.mvc.tobe.ControllerAdviceConverter;
 import com.interface21.webmvc.servlet.mvc.tobe.HandlerConverter;
 import com.interface21.webmvc.servlet.mvc.tobe.support.*;
 import org.h2.jdbcx.JdbcDataSource;
@@ -46,6 +47,13 @@ public class MyConfiguration {
         return handlerConverter;
     }
 
+    @Bean
+    public ControllerAdviceConverter controllerAdviceConverter() {
+        ControllerAdviceConverter controllerAdviceConverter = new ControllerAdviceConverter();
+        controllerAdviceConverter.setArgumentResolvers(defaultExceptionArgumentResolvers());
+        return controllerAdviceConverter;
+    }
+
     List<HandlerMethodArgumentResolver> defaultArgumentResolvers() {
         return asList(
             new HttpRequestArgumentResolver(),
@@ -53,6 +61,13 @@ public class MyConfiguration {
             new RequestParamArgumentResolver(),
             new PathVariableArgumentResolver(),
             new ModelArgumentResolver()
+        );
+    }
+
+    List<HandlerMethodArgumentResolver> defaultExceptionArgumentResolvers() {
+        return asList(
+            new HttpRequestArgumentResolver(),
+            new HttpResponseArgumentResolver()
         );
     }
 }

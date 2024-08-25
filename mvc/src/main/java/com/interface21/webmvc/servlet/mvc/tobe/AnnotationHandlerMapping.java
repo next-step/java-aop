@@ -2,6 +2,7 @@ package com.interface21.webmvc.servlet.mvc.tobe;
 
 import com.interface21.context.ApplicationContext;
 import com.interface21.context.stereotype.Controller;
+import com.interface21.context.stereotype.ControllerAdvice;
 import com.interface21.web.bind.annotation.RequestMethod;
 import com.interface21.webmvc.servlet.mvc.HandlerMapping;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,11 +18,14 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     private final ApplicationContext applicationContext;
     private final HandlerConverter handlerConverter;
+    private final ControllerAdviceConverter controllerAdviceConverter;
     private final Map<HandlerKey, HandlerExecution> handlerExecutions = new HashMap<>();
 
-    public AnnotationHandlerMapping(final ApplicationContext applicationContext, final HandlerConverter handlerConverter) {
+    public AnnotationHandlerMapping(final ApplicationContext applicationContext, final HandlerConverter handlerConverter,
+                                    final ControllerAdviceConverter controllerAdviceConverter) {
         this.applicationContext = applicationContext;
         this.handlerConverter = handlerConverter;
+        this.controllerAdviceConverter = controllerAdviceConverter;
     }
 
     public void initialize() {
@@ -41,11 +45,26 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         return controllers;
     }
 
+    private Map<Class<?>, Object> getControllerAdvice(ApplicationContext ac) {
+        final var advices = new HashMap<Class<?>, Object>();
+        for (Class<?> clazz : ac.getBeanClasses()) {
+            final var annotation = clazz.getAnnotation(ControllerAdvice.class);
+            if (annotation != null) {
+                advices.put(clazz, ac.getBean(clazz));
+            }
+        }
+        return advices;
+    }
+
     public HandlerExecution getHandler(final HttpServletRequest request) {
         final var requestUri = request.getRequestURI();
         final var requestMethod = RequestMethod.valueOf(request.getMethod().toUpperCase());
         log.debug("requestUri : {}, requestMethod : {}", requestUri, requestMethod);
         return getHandlerInternal(new HandlerKey(requestUri, requestMethod));
+    }
+
+    public Map<Class<? extends Throwable>, HandlerExecution> getExceptionHandlers() {
+        return controllerAdviceConverter.convert(getControllerAdvice(applicationContext));
     }
 
     private HandlerExecution getHandlerInternal(final HandlerKey requestHandlerKey) {
