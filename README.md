@@ -69,6 +69,14 @@ cligb를 구현할 때 스샷을 참고해서 아래 VM 옵션을 활성화한�
 - [x] say로 시작하는 메서드에 한해서만 메서드의 반환 값을 대문자로 변환하기 
 
 ## 🚀 2단계 - Proxy와 Bean 의존관계
+### 목표 
+- Proxy 객체를 빈으로 등록하는 것이 최종 목표입니다.
+
+### 문제 
+- Proxy 객체는 `@Component`를 이용해 빈을 등록하는 것이 불가능하기 때문에 빈을 등록할 수 있는 방법이 따로 필요합니다. 
+- 현재 DI 컨테이너는 Proxy 객체를 등록할 방법이 마련되어 있지 않습니다.
+  - 물론, `@Configuration` + `@Bean` 조합으로 등록하는 방법도 있지만, 학습을 위해 팩토리빈을 이용하기로 하였습니다. 
+
 ### DI 컨테이너의 Bean과 Proxy를 연결하기
 자바 객체가 특정 interface를 구현한 경우 빈을 생성할 때 예외 처리를 할 수 있도록 DI 컨테이너를 개선한다
 ```java
@@ -76,10 +84,13 @@ public interface FactoryBean<T> {
     T getObject() throws Exception;
 }
 ```
-- [] FactoryBean 인터페이스를 구현하는 Bean은 구현체를 DI에 등록하는게 아니고, `getObject()`메서드가 반환하는 Bean을 등록해야 한다 
-  - `getObject()`가 반환하는 Bean = 프록시 객체 
+- [x] FactoryBean 인터페이스를 구현하는 Bean은 구현체를 DI에 등록하는게 아니고, `getObject()`메서드가 반환하는 Bean을 등록해야 한다 
+  - `DefaultListableBeanFactory`에 해당 기능을 구현하였습니다. 아래의 메서드를 참고해 주세요!
+    - `private Object getObjectForBeanInstance(final Object beanInstance) {}`
+    - 메서드 네이밍은 Spring에 구현된 메서드 이름을 똑같이 따라해 보았습니다. 
 
 
 ### 재사용 가능한 FactoryBean 만들기
 Proxy가 추가될 때 마다 FactoryBean을 생성하는 것은 귀찮은 일이다. 공통으로 사용될만한 FactoryBean을 만들자 
-- [] Target, Advice, PointCut을 연결해 Proxy를 생성하는 재사용 가능한 FactoryBean 추가하기 
+- [x] Target, Advice, PointCut을 연결해 Proxy를 생성하는 재사용 가능한 FactoryBean 추가하기
+  - `ProxyFactoryBean`이라는 클래스를 통해 구현하였습니다. 
