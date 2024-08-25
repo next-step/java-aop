@@ -57,3 +57,7 @@ cligb를 구현할 때 스샷을 참고해서 아래 VM 옵션을 활성화한�
 ![](docs/images/add-vm-options.png)
 
 ![](docs/images/input-options.png)
+
+### 1단계 미션 요구사항
+- [ ] : java dynamic proxy를 이용하여 문자열을 대문자로 반환하도록 변환
+- [ ] : cglib proxy를 이용하여 문자열을 대문자로 변환하도록 변환
