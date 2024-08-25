@@ -2,16 +2,22 @@ package com.interface21.beans.factory.support;
 
 import com.interface21.beans.BeanUtils;
 import com.interface21.beans.factory.ConfigurableListableBeanFactory;
+import com.interface21.beans.factory.FactoryBean;
 import com.interface21.beans.factory.config.BeanDefinition;
 import com.interface21.context.annotation.AnnotatedBeanDefinition;
 import jakarta.annotation.PostConstruct;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultListableBeanFactory implements BeanDefinitionRegistry, ConfigurableListableBeanFactory {
 
@@ -42,11 +48,11 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         }
 
         BeanDefinition beanDefinition = beanDefinitions.get(clazz);
-        if (beanDefinition instanceof AnnotatedBeanDefinition) {
-            Optional<Object> optionalBean = createAnnotatedBean(beanDefinition);
-            optionalBean.ifPresent(b -> beans.put(clazz, b));
+        if (beanDefinition instanceof AnnotatedBeanDefinition annotatedBeanDefinition) {
+            bean = getObjectForBeanInstance(createAnnotatedBean(annotatedBeanDefinition));
+            beans.put(bean.getClass(), bean);
             initialize(bean, clazz);
-            return (T) optionalBean.orElse(null);
+            return (T) bean;
         }
 
         Optional<Class<?>> concreteClazz = BeanFactoryUtils.findConcreteClass(clazz, getBeanClasses());
@@ -56,10 +62,24 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
 
         beanDefinition = beanDefinitions.get(concreteClazz.get());
         log.debug("BeanDefinition : {}", beanDefinition);
-        bean = inject(beanDefinition);
-        beans.put(concreteClazz.get(), bean);
+
+        bean = getObjectForBeanInstance(inject(beanDefinition));
+        beans.put(bean.getClass(), bean);
+
         initialize(bean, concreteClazz.get());
         return (T) bean;
+    }
+
+    private Object getObjectForBeanInstance(final Object beanInstance) {
+        if (beanInstance instanceof FactoryBean<?> factoryBean) {
+            try {
+                return factoryBean.getObject();
+            } catch (Exception e) {
+                throw new RuntimeException("FactoryBean.getObject() 실행 실패", e);
+            }
+        }
+
+        return beanInstance;
     }
 
     private void initialize(Object bean, Class<?> beanClass) {
@@ -74,12 +94,12 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         }
     }
 
-    private Optional<Object> createAnnotatedBean(BeanDefinition beanDefinition) {
-        final var annotatedBeanDefinition = (AnnotatedBeanDefinition) beanDefinition;
-        final var method = annotatedBeanDefinition.getMethod();
-        final var bean = getBean(method.getDeclaringClass());
-        final var args = populateArguments(method.getParameterTypes());
-        return BeanFactoryUtils.invokeMethod(method, bean, args);
+    private Object createAnnotatedBean(AnnotatedBeanDefinition annotatedBeanDefinition) {
+        Method method = annotatedBeanDefinition.getMethod();
+        Object bean = getBean(method.getDeclaringClass());
+        Object[] args = populateArguments(method.getParameterTypes());
+        return BeanFactoryUtils.invokeMethod(method, bean, args)
+                .orElseThrow(() -> new IllegalArgumentException("@Bean 메서드에 잘못된 값이 입력되었습니다. method=%s, bean=%s, args=%s".formatted(method.getName(), bean.getClass(), Arrays.toString(args))));
     }
 
     private Object[] populateArguments(Class<?>[] paramTypes) {
