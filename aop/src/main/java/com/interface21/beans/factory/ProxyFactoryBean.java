@@ -9,6 +9,12 @@ public class ProxyFactoryBean<T> implements FactoryBean {
     private Advice advice;
     private PointCut pointCut;
 
+    public ProxyFactoryBean(Class<T> target, Advice advice, PointCut pointCut) {
+        this.target = target;
+        this.advice = advice;
+        this.pointCut = pointCut;
+    }
+
     public void setTarget(Class<T> target) {
         this.target = target;
     }
@@ -31,14 +37,11 @@ public class ProxyFactoryBean<T> implements FactoryBean {
 
     private MethodInterceptor methodInterceptor() {
         return (object, method, args, methodProxy) -> {
+            Object result;
             if (pointCut.matches(method)) {
-                advice.before();
-            }
-
-            Object result = methodProxy.invokeSuper(object, args);
-
-            if (pointCut.matches(method)) {
-                advice.after();
+                result = advice.around(new ProceedingJoinPoint(object, method, args));
+            } else {
+                result = methodProxy.invokeSuper(object, args);
             }
             return result;
         };
