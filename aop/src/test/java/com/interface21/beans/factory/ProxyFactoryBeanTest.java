@@ -13,10 +13,9 @@ class ProxyFactoryBeanTest {
 
     @Test
     void testProxyFactoryBean() {
-        ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean();
-        proxyFactoryBean.setTarget(HelloTarget.class);
         Advice advice = Mockito.mock(Advice.class);
         PointCut pointCut = Mockito.mock(PointCut.class);
+        ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean(HelloTarget.class, advice, pointCut);
 
         proxyFactoryBean.setAdvice(advice);
         proxyFactoryBean.setPointCut(pointCut);
@@ -26,8 +25,7 @@ class ProxyFactoryBeanTest {
 
         helloTarget.sayHello("test");
 
-        verify(pointCut, times(2)).matches(any());
-        verify(advice, times(1)).before();
-        verify(advice, times(1)).after();
+        verify(pointCut, times(1)).matches(any());
+        verify(advice, times(1)).around(any());
     }
 }
