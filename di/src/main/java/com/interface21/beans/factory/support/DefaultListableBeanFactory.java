@@ -82,10 +82,9 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
     }
 
     private Object postProcessBean(Object bean) {
-        for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
-            bean = beanPostProcessor.postInitialization(bean);
-        }
-        return bean;
+        return beanPostProcessors.stream()
+                                 .filter(beanPostProcessor -> beanPostProcessor.supports(bean.getClass()))
+                                 .reduce(bean, (b, processor) -> processor.postInitialization(b), (b1, b2) -> b1);
     }
 
     private void initialize(Object bean, Class<?> beanClass) {

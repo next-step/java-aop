@@ -19,12 +19,15 @@ public class TransactionProxyBeanPostProcessor implements BeanPostProcessor {
         this.advice = new TransactionAdvice(transactionManager);
     }
 
+    @Override
+    public boolean supports(Class<?> clazz) {
+        return requiresTransaction(clazz);
+    }
+
+    @Override
     public Object postInitialization(Object bean) {
         Class<?> clazz = bean.getClass();
-        if (requiresTransaction(clazz)) {
-            return new ProxyFactoryBean<>(clazz, advice, pointCut);
-        }
-        return bean;
+        return new ProxyFactoryBean<>(clazz, advice, pointCut);
     }
 
     private boolean requiresTransaction(Class<?> clazz) {
