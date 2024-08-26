@@ -80,6 +80,8 @@ class Concepts : FreeSpec({
                 }
             }
 
+            // 실행 성공하려면 IntelliJ 의 gradle 설정에서 Run tests using: 을 IntelliJ로 변경해야 합니다.
+            // https://github.com/next-step/java-aop 에서 VM options 를 참조해서 추가해 줍니다.
             """
             🌟CGLIB(Code Generator Library) Proxy
             서드파티 코드나 수정할 수 없는 레거시 코드로 작업할 때 인터페이스를 사용할 수 없는 경우가 있습니다.
