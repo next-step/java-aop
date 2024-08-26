@@ -6,6 +6,7 @@ import camp.nextstep.domain.User;
 import camp.nextstep.domain.UserHistory;
 import com.interface21.beans.factory.annotation.Autowired;
 import com.interface21.context.stereotype.Service;
+import com.interface21.dao.DataAccessException;
 import com.interface21.transaction.annotation.Transactional;
 
 @Service
@@ -37,6 +38,9 @@ public class UserService {
         final var user = findById(id);
         user.changePassword(newPassword);
         userDao.update(user);
+        if (newPassword == null) {
+            throw new DataAccessException();
+        }
         userHistoryDao.log(new UserHistory(user, createBy));
     }
 }
