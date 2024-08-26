@@ -1,25 +1,30 @@
-package com.interface21.beans.factory.proxy;
+package com.interface21.beans.factory;
 
+import com.interface21.beans.factory.proxy.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
+import samples.FakeBeanFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 class ProxyFactoryBeanTest {
+
+    private final BeanFactory beanFactory = new FakeBeanFactory();
 
     @DisplayName("target 클래스의 타입을 반환 한다")
     @Test
     public void getObjectType() throws Exception {
         // given
-        final ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean();
+        final ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean(beanFactory);
         proxyFactoryBean.setTargetClass(new TypeTarget<>(TargetBean.class));
 
         // when
@@ -33,7 +38,7 @@ class ProxyFactoryBeanTest {
     @Test
     public void getObject() throws Exception {
         // given
-        final ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean();
+        final ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean(beanFactory);
         proxyFactoryBean.setTargetClass(new TypeTarget<>(TargetBean.class));
 
         // when
@@ -47,7 +52,7 @@ class ProxyFactoryBeanTest {
     @Test
     public void invokeProxyMethodWithoutAdvisor() throws Exception {
         // given
-        final ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean();
+        final ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean(beanFactory);
         proxyFactoryBean.setTargetClass(new TypeTarget<>(TargetBean.class));
         final TargetBean proxy = (TargetBean) proxyFactoryBean.getObject();
 
@@ -59,7 +64,7 @@ class ProxyFactoryBeanTest {
     @Test
     public void invokeProxyMethodWithMethodBeforeAdvice() throws Throwable {
         // given
-        final ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean();
+        final ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean(beanFactory);
         proxyFactoryBean.setTargetClass(new TypeTarget<>(TargetBean.class));
         final MethodBeforeAdvice beforeAdvice1 = mock();
         final MethodBeforeAdvice beforeAdvice2 = mock();
@@ -82,7 +87,7 @@ class ProxyFactoryBeanTest {
     @Test
     public void invokeProxyMethodWithAfterRunningAdvice() throws Throwable {
         // given
-        final ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean();
+        final ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean(beanFactory);
         proxyFactoryBean.setTargetClass(new TypeTarget<>(TargetBean.class));
         final AfterReturningAdvice afterAdvice1 = mock();
         final AfterReturningAdvice afterAdvice2 = mock();
@@ -101,11 +106,30 @@ class ProxyFactoryBeanTest {
         );
     }
 
+    @DisplayName("프록시를 생성할 때, 등록 된 ThrowsAdvice 가 있다면 메서드 중 예외가 던져지면 advice 를 실행 한다")
+    @Test
+    public void invokeProxyMethodWitThrowsAdvice() throws Throwable {
+        // given
+        final ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean(beanFactory);
+        proxyFactoryBean.setTargetClass(new TypeTarget<>(TargetBean.class));
+        final List<Exception> exceptions = new ArrayList<>();
+        final ThrowsAdvice throwsAdvice = exceptions::add;
+        final Advisor advisor = new Advisor(throwsAdvice);
+        proxyFactoryBean.addAdvisors(advisor);
+        final TargetBean proxy = (TargetBean) proxyFactoryBean.getObject();
+
+        // when then
+        assertAll(
+                () -> assertThatThrownBy(proxy::throwHello),
+                () -> assertThat(exceptions).isNotEmpty()
+        );
+    }
+
     @DisplayName("프록시 메서드를 호출할 때 등록된 Advice 가 존재 해도 Pointcut 조건에 만족하지 않으면 advice 는 실행 되지 않는다")
     @Test
     public void invokeProxyMethodWithNotMatchAdvice() throws Throwable {
         // given
-        final ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean();
+        final ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean(beanFactory);
         proxyFactoryBean.setTargetClass(new TypeTarget<>(TargetBean.class));
         final Pointcut falsePointcut = (method, targetClass) -> false;
         final AfterReturningAdvice advice1 = mock();
@@ -129,7 +153,7 @@ class ProxyFactoryBeanTest {
     @Test
     public void invokeAdviceOrder() throws Throwable {
         // given
-        final ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean();
+        final ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean(beanFactory);
         proxyFactoryBean.setTargetClass(new TypeTarget<>(TargetBean.class));
         final MethodBeforeAdvice beforeAdvice = mock();
         final AfterReturningAdvice afterAdvice = mock();
@@ -152,6 +176,10 @@ class ProxyFactoryBeanTest {
     public static class TargetBean {
         String hello() {
             return "hello";
+        }
+
+        String throwHello() throws RuntimeException {
+            throw new RuntimeException();
         }
     }
 
