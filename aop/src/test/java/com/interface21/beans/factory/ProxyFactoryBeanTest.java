@@ -76,6 +76,27 @@ class ProxyFactoryBeanTest {
         assertThat(beforeAdvice.isBeforeCalled()).isFalse();
     }
 
+
+    @Test
+    @DisplayName("ThrowsAdvice 가 정상적으로 호출된다.")
+    void throwsAdviceTest() {
+        final ProxyFactoryBean<FakeClass> factoryBean = new ProxyFactoryBean<>(FakeClass.class);
+        final FakeThrowsAdvice throwsAdvice = new FakeThrowsAdvice();
+        final ExceptionPointCut pointCut = new ExceptionPointCut();
+        final DefaultAdvisor advisor = new DefaultAdvisor(throwsAdvice, pointCut);
+        factoryBean.addAdvisors(advisor);
+
+        final FakeClass proxy = factoryBean.getObject();
+
+        try {
+            proxy.exception();
+        } catch (final Exception ignored) {
+
+        }
+
+        assertThat(throwsAdvice.isAfterCalled()).isTrue();
+    }
+
     static class FakeClass {
         public String sayHello() {
             return "Hello";
@@ -83,6 +104,10 @@ class ProxyFactoryBeanTest {
 
         public String sayBye() {
             return "Bye";
+        }
+
+        public String exception() {
+            throw new RuntimeException();
         }
     }
 
@@ -112,10 +137,30 @@ class ProxyFactoryBeanTest {
         }
     }
 
+    static class FakeThrowsAdvice implements ThrowsAdvice {
+        private boolean afterCalled = false;
+
+        @Override
+        public void afterThrowing(final Exception ex, final Method method, final Object[] args, final Object target) {
+            afterCalled = true;
+        }
+
+        public boolean isAfterCalled() {
+            return afterCalled;
+        }
+    }
+
     static class SayHelloPointCut implements PointCut {
         @Override
         public MethodMatcher getMethodMatcher() {
             return (method, targetClass, args) -> method.getName().equals("sayHello");
+        }
+    }
+
+    static class ExceptionPointCut implements PointCut {
+        @Override
+        public MethodMatcher getMethodMatcher() {
+            return (method, targetClass, args) -> method.getName().equals("exception");
         }
     }
 }
