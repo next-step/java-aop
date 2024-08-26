@@ -16,6 +16,7 @@ repositories {
 
 dependencies {
     implementation project(':aop')
+    implementation project(':jdbc')
 
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
     annotationProcessor 'jakarta.annotation:jakarta.annotation-api:2.1.1'
