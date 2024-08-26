@@ -1,6 +1,7 @@
 package study.cglibproxy;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import net.sf.cglib.proxy.Enhancer;
@@ -42,6 +43,33 @@ public class CglibTest {
                 () -> assertThat(helloProxy.doSay("kim")).isEqualTo("kim"),
                 () -> assertThat(helloProxy.doSayYesOrNo()).isEqualTo("yes"),
                 () -> assertThat(helloProxy.pingPong("kim")).isEqualTo("Ping Pong kim")
+        );
+    }
+
+    @DisplayName("CGLIB의 enhancer.create()에 인수를 넘기지 않으면, 기본 생성자가 없는 경우 예외를 발생시킨다.")
+    @Test
+    void createProxy2() {
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(ConstructorTarget.class);
+        enhancer.setCallback(new UppercaseMethodInterceptor(new SayMethodMatcher()));
+
+        assertThatThrownBy(enhancer::create)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Superclass has no null constructors but no arguments were given");
+    }
+
+    @DisplayName("CGLIB의 enhancer.create()에 생성자에 필요한 인수를 넘기면 프록시가 생성된다.")
+    @Test
+    void createProxy3() {
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(ConstructorTarget.class);
+        enhancer.setCallback(new UppercaseMethodInterceptor(new SayMethodMatcher()));
+
+        ConstructorTarget proxy = (ConstructorTarget) enhancer.create(new Class[]{String.class}, new Object[]{"kim"});
+
+        assertAll(
+                () -> assertThat(proxy.sayName()).isEqualTo("KIM"),
+                () -> assertThat(proxy.pingPong()).isEqualTo("ping pong")
         );
     }
 }
