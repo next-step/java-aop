@@ -16,4 +16,12 @@ class HelloTarget {
     public String pingPong(String name) {
         return "Ping Pong " + name;
     }
+
+    public String doSay(String name) {
+        return name;
+    }
+
+    public String doSayYesOrNo() {
+        return "yes";
+    }
 }

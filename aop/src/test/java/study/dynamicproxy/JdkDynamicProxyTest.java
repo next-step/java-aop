@@ -24,6 +24,8 @@ public class JdkDynamicProxyTest {
                 () -> assertThat(helloProxy.sayHello("kim")).isEqualTo("HELLO KIM"),
                 () -> assertThat(helloProxy.sayHi("kim")).isEqualTo("HI KIM"),
                 () -> assertThat(helloProxy.sayThankYou("kim")).isEqualTo("THANK YOU KIM"),
+                () -> assertThat(helloProxy.doSay("kim")).isEqualTo("kim"),
+                () -> assertThat(helloProxy.doSayYesOrNo()).isEqualTo("yes"),
                 () -> assertThat(helloProxy.pingPong("kim")).isEqualTo("Ping Pong kim")
         );
     }

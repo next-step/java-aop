@@ -43,10 +43,13 @@ class Concepts : FreeSpec({
         
         ❗️프록시(Proxy)와 프록시 패턴(Proxy pattern)은 다른 개념입니다.
         프록시는 클라이언트가 사용하려는 실제 타깃인 것처럼 위장해서 클라이언트 요청을 대신 받아줍니다. 대리인과 같은 역할입니다.
-        프록시를 쓰는 목적은 1. 클라이언트가 타깃에 접근하는 방법을 제어하거나 2. 타깃에 부가기능을 부여하기 위해 사용합니다.
+        프록시를 쓰는 목적은 
+        1. 클라이언트가 타깃에 접근하는 방법을 제어하거나 
+        2. 타깃에 부가기능을 부여하기 위해 사용합니다.
         디자인 패턴에서는 두 가지 목적을 다른 패턴으로 구분합니다.
         타깃에 접근하는 방법을 제어하는 패턴은 프록시 패턴(Proxy pattern)이고,
         타깃에 부가기능을 부여하는 패턴은 데코레이터 패턴(Decorator pattern)이라 부릅니다.
+        - Input/OutputStream이 대표적인 데코레이터 패턴이 적용도니 예시이다  
         """ - {
 
             """
@@ -58,7 +61,7 @@ class Concepts : FreeSpec({
             """ {
                 // SecureBean 인터페이스를 구현한 프록시 객체를 생성
                 val jdkDynamicAopProxy = JdkDynamicAopProxy()
-                jdkDynamicAopProxy.setInterfaces(SecureBean::class.java);
+                jdkDynamicAopProxy.setInterfaces(SecureBean::class.java)
                 jdkDynamicAopProxy.addAdvice(SecurityInvocationHandler(SecureBeanTarget()))
                 val secureBean = jdkDynamicAopProxy.proxy as SecureBean
 
