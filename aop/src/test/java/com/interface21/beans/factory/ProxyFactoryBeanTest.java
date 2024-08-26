@@ -20,6 +20,19 @@ class ProxyFactoryBeanTest {
     }
 
     @Test
+    @DisplayName("argumentTypes 와 arguments 를 사용하여 기본 생성자가 없는 프록시 객체를 생성할 수 있다.")
+    void proxyCreationWithoutNoArgConstructorTest() {
+        final ProxyFactoryBean<FakeClassWithoutNoArgConstructor> factoryBean = new ProxyFactoryBean<>(FakeClassWithoutNoArgConstructor.class);
+
+        final Class<?>[] argumentTypes = new Class<?>[]{String.class};
+        final Object[] arguments = new Object[]{"jongmin"};
+
+        final FakeClassWithoutNoArgConstructor proxy = factoryBean.getObject(argumentTypes, arguments);
+
+        assertThat(proxy.sayHello()).isEqualTo("Hello jongmin");
+    }
+
+    @Test
     @DisplayName("프록시 객체가 기존 객체의 메서드를 호출할 수 있다.")
     void proxyMethodInvocationTest() {
         final ProxyFactoryBean<FakeClass> factoryBean = new ProxyFactoryBean<>(FakeClass.class);
@@ -108,6 +121,18 @@ class ProxyFactoryBeanTest {
 
         public String exception() {
             throw new RuntimeException();
+        }
+    }
+
+    static class FakeClassWithoutNoArgConstructor {
+        private final String name;
+
+        public FakeClassWithoutNoArgConstructor(final String name) {
+            this.name = name;
+        }
+
+        public String sayHello() {
+            return "Hello " + name;
         }
     }
 

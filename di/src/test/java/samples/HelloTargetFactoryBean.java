@@ -8,4 +8,14 @@ public class HelloTargetFactoryBean implements FactoryBean<HelloTarget> {
     public HelloTarget getObject() {
         return new HelloTarget();
     }
+
+    @Override
+    public HelloTarget getObject(final Class<?>[] argumentTypes, final Object[] arguments) {
+        return new HelloTarget();
+    }
+
+    @Override
+    public Class<HelloTarget> getType() {
+        return HelloTarget.class;
+    }
 }

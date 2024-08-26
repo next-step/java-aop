@@ -17,4 +17,14 @@ public class TransactionProxyFactoryBean<T> implements FactoryBean<T> {
     public T getObject() {
         return proxyFactoryBean.getObject();
     }
+
+    @Override
+    public T getObject(final Class<?>[] argumentTypes, final Object[] arguments) {
+        return proxyFactoryBean.getObject(argumentTypes, arguments);
+    }
+
+    @Override
+    public Class<T> getType() {
+        return proxyFactoryBean.getType();
+    }
 }
