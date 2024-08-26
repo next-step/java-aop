@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import study.SayMethodMatcher;
@@ -70,6 +71,30 @@ public class CglibTest {
         assertAll(
                 () -> assertThat(proxy.sayName()).isEqualTo("KIM"),
                 () -> assertThat(proxy.pingPong()).isEqualTo("ping pong")
+        );
+    }
+
+    @DisplayName("CGLIB 프록시에도 원본 객체를 넘겨서 사용하게 할 수 있다.")
+    @Test
+    void createProxy4() {
+        ConstructorTarget target = new ConstructorTarget("park");
+        MethodInterceptor pingUppercaseMethodInterceptor = (obj, method, args, proxy) -> {
+            String result = (String) method.invoke(target, args);
+            if (method.getName().startsWith("ping")) {
+                return result.toUpperCase();
+            }
+            return result;
+        };
+
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(ConstructorTarget.class);
+        enhancer.setCallback(pingUppercaseMethodInterceptor);
+
+        ConstructorTarget proxy = (ConstructorTarget) enhancer.create(new Class[]{String.class}, new Object[]{"kim"});
+
+        assertAll(
+                () -> assertThat(proxy.sayName()).isEqualTo("park"),
+                () -> assertThat(proxy.pingPong()).isEqualTo("PING PONG")
         );
     }
 }
