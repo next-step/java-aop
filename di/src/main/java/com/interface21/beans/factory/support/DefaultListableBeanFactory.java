@@ -14,7 +14,12 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 public class DefaultListableBeanFactory implements BeanDefinitionRegistry, ConfigurableListableBeanFactory {
 
@@ -79,7 +84,13 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
     private Object unwrapIfNecessary(final Object beanInstance) {
         if (beanInstance instanceof final FactoryBean<?> factoryBean) {
             try {
-                return factoryBean.getObject();
+                final Class<?> type = factoryBean.getType();
+                final Constructor<?> injectedConstructor = BeanFactoryUtils.getInjectedConstructor(type);
+                if (injectedConstructor == null) {
+                    return factoryBean.getObject();
+                }
+                final Class<?>[] parameterTypes = injectedConstructor.getParameterTypes();
+                return factoryBean.getObject(parameterTypes, populateArguments(parameterTypes));
             } catch (final Exception e) {
                 log.error(e.getMessage());
                 throw new BeanInstantiationException(beanInstance.getClass(), e.getMessage());
@@ -96,7 +107,7 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         for (Method initializeMethod : initializeMethods) {
             log.debug("@PostConstruct Initialize Method : {}", initializeMethod);
             BeanFactoryUtils.invokeMethod(initializeMethod, bean,
-                populateArguments(initializeMethod.getParameterTypes()));
+                    populateArguments(initializeMethod.getParameterTypes()));
         }
     }
 
