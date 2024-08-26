@@ -35,4 +35,17 @@ class AnnotationConfigWebApplicationContextTest {
         // then
         assertThat(SayCounter.currentCount()).isEqualTo(1);
     }
+
+    @DisplayName("@Transaction 이 붙은 클래스를 프록시로 빈을 생성 한다")
+    @Test
+    public void transactionalProxyConfiguration() throws Exception {
+        // given
+        final AnnotationConfigWebApplicationContext applicationContext = new AnnotationConfigWebApplicationContext(ProxyConfiguration.class);
+
+        // when
+        final ProxyConfiguration.TxTypeBean actual = applicationContext.getBean(ProxyConfiguration.TxTypeBean.class);
+
+        // then
+        assertThat(actual).isNotExactlyInstanceOf(ProxyConfiguration.TxTypeBean.class);
+    }
 }
