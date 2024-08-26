@@ -62,3 +62,21 @@ cligb를 구현할 때 스샷을 참고해서 아래 VM 옵션을 활성화한�
 ## 1단계 요구사항
 - [x] cglib 대문자 반환하게 만든다.
 - [x] dynamic proxy 대문자 반환하게 만든다.
+
+
+## 2단계 요구사항
+
+- [] 1. DI 컨테이너의 Bean과 Proxy 를 연결
+  - 기능
+    - [] Factory Bean에서 CGLIB 프록시 객체를 생성한다.
+- [] 2. 재사용 가능한 Factory Bean
+  - 기능
+    - [] Target 연결가능
+      - 대상 클래스
+    - [] Advice 연결가능
+      - 비즈니스 로직 전후에 들어갈 로직들을 실행한다.
+    - [] PointCut 연결가능
+      - Matcher로 method 특정한다.
+
+
+
