@@ -1,7 +1,9 @@
 package com.interface21.beans.factory.support;
 
+import com.interface21.beans.BeanInstantiationException;
 import com.interface21.beans.BeanUtils;
 import com.interface21.beans.factory.ConfigurableListableBeanFactory;
+import com.interface21.beans.factory.FactoryBean;
 import com.interface21.beans.factory.config.BeanDefinition;
 import com.interface21.context.annotation.AnnotatedBeanDefinition;
 import jakarta.annotation.PostConstruct;
@@ -57,9 +59,22 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         beanDefinition = beanDefinitions.get(concreteClazz.get());
         log.debug("BeanDefinition : {}", beanDefinition);
         bean = inject(beanDefinition);
+        bean = unwrapIfNecessary(bean);
         beans.put(concreteClazz.get(), bean);
         initialize(bean, concreteClazz.get());
         return (T) bean;
+    }
+
+    private Object unwrapIfNecessary(final Object beanInstance) {
+        if (beanInstance instanceof final FactoryBean<?> factoryBean) {
+            try {
+                return factoryBean.getObject();
+            } catch (final Exception e) {
+                log.error(e.getMessage());
+                throw new BeanInstantiationException(beanInstance.getClass(), e.getMessage());
+            }
+        }
+        return beanInstance;
     }
 
     private void initialize(Object bean, Class<?> beanClass) {
