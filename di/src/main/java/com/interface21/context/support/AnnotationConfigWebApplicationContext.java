@@ -5,13 +5,12 @@ import com.interface21.context.ApplicationContext;
 import com.interface21.context.annotation.AnnotatedBeanDefinitionReader;
 import com.interface21.context.annotation.ClassPathBeanDefinitionScanner;
 import com.interface21.context.annotation.ComponentScan;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AnnotationConfigWebApplicationContext implements ApplicationContext {
 

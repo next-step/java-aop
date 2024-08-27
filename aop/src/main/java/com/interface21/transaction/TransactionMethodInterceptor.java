@@ -10,10 +10,10 @@ public class TransactionMethodInterceptor implements MethodInterceptor {
     private final Object target;
     private final TransactionMethodMatcher transactionMethodMatcher;
 
-    public TransactionMethodInterceptor(final PlatformTransactionManager transactionManager, final Object target, final TransactionMethodMatcher transactionMethodMatcher) {
+    public TransactionMethodInterceptor(final PlatformTransactionManager transactionManager, final Object target) {
         this.transactionManager = transactionManager;
         this.target = target;
-        this.transactionMethodMatcher = transactionMethodMatcher;
+        this.transactionMethodMatcher = new TransactionMethodMatcher();
     }
 
     @Override

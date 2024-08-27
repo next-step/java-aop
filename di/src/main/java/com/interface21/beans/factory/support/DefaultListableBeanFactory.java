@@ -3,8 +3,10 @@ package com.interface21.beans.factory.support;
 import com.interface21.beans.BeanUtils;
 import com.interface21.beans.factory.ConfigurableListableBeanFactory;
 import com.interface21.beans.factory.FactoryBean;
+import com.interface21.beans.factory.TransactionProxyCreator;
 import com.interface21.beans.factory.config.BeanDefinition;
 import com.interface21.context.annotation.AnnotatedBeanDefinition;
+import com.interface21.transaction.annotation.Transactional;
 import jakarta.annotation.PostConstruct;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +53,8 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         BeanDefinition beanDefinition = beanDefinitions.get(clazz);
         if (beanDefinition instanceof AnnotatedBeanDefinition annotatedBeanDefinition) {
             bean = getObjectForBeanInstance(createAnnotatedBean(annotatedBeanDefinition));
+            bean = postInitializationIfNecessary(bean);
+
             beans.put(bean.getClass(), bean);
             initialize(bean, clazz);
             return (T) bean;
@@ -64,10 +69,33 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         log.debug("BeanDefinition : {}", beanDefinition);
 
         bean = getObjectForBeanInstance(inject(beanDefinition));
+        bean = postInitializationIfNecessary(bean);
         beans.put(bean.getClass(), bean);
 
         initialize(bean, concreteClazz.get());
         return (T) bean;
+    }
+
+    private Object postInitializationIfNecessary(Object bean) {
+        if (hasTransactionalAnnotationAtLeastOne(bean)) {
+            TransactionProxyCreator transactionProxyCreator = new TransactionProxyCreator(getBean(DataSource.class));
+            bean = transactionProxyCreator.postInitialization(bean);
+        }
+        return bean;
+    }
+
+    private boolean hasTransactionalAnnotationAtLeastOne(final Object bean) {
+        Class<?> beanType = bean.getClass();
+        return hasAnnotationOnClass(beanType) || hasAnnotationOnMethod(beanType);
+    }
+
+    private boolean hasAnnotationOnClass(final Class<?> beanType) {
+        return beanType.getAnnotation(Transactional.class) != null;
+    }
+
+    private boolean hasAnnotationOnMethod(final Class<?> beanType) {
+        return Arrays.stream(beanType.getDeclaredMethods())
+                .anyMatch(method -> method.getAnnotation(Transactional.class) != null);
     }
 
     private Object getObjectForBeanInstance(final Object beanInstance) {
@@ -78,8 +106,6 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
                 throw new RuntimeException("FactoryBean.getObject() 실행 실패", e);
             }
         }
-
-        // 빈 후처리기를 통해서 프록시 적용 대상인지 확인하고 대상인 경우 프록시를 생성한다
 
         return beanInstance;
     }
