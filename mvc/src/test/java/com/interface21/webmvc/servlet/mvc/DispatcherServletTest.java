@@ -47,15 +47,15 @@ class DispatcherServletTest {
         final var annotationHandlerMapping = new AnnotationHandlerMapping(applicationContext, handlerConverter);
         annotationHandlerMapping.initialize();
         final var exceptionHandlerConverter = applicationContext.getBean(ExceptionHandlerConverter.class);
-        final var exceptionHandlerMapping = new ExceptionHandlerMapping(applicationContext, exceptionHandlerConverter);
-        exceptionHandlerMapping.initialize();
 
-        dispatcherServlet = new DispatcherServlet(exceptionHandlerMapping);
+        dispatcherServlet = new DispatcherServlet();
         dispatcherServlet.addHandlerMapping(new ManualHandlerMapping());
         dispatcherServlet.addHandlerMapping(new AnnotationHandlerMapping(applicationContext, handlerConverter));
 
         dispatcherServlet.addHandlerAdapter(new ControllerHandlerAdapter());
         dispatcherServlet.addHandlerAdapter(new HandlerExecutionHandlerAdapter());
+
+        dispatcherServlet.addExceptionHandlerMapping(new ExceptionHandlerMapping(applicationContext, exceptionHandlerConverter));
         dispatcherServlet.init();
     }
 

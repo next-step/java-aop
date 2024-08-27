@@ -25,15 +25,15 @@ public class MyWebApplicationInitializer implements WebApplicationInitializer {
         final var annotationHandlerMapping = new AnnotationHandlerMapping(applicationContext, handlerConverter);
         annotationHandlerMapping.initialize();
         final var exceptionHandlerConverter = applicationContext.getBean(ExceptionHandlerConverter.class);
-        final var exceptionHandlerMapping = new ExceptionHandlerMapping(applicationContext, exceptionHandlerConverter);
-        exceptionHandlerMapping.initialize();
 
-        final var dispatcherServlet = new DispatcherServlet(exceptionHandlerMapping);
+        final var dispatcherServlet = new DispatcherServlet();
         dispatcherServlet.addHandlerMapping(new ManualHandlerMapping());
         dispatcherServlet.addHandlerMapping(new AnnotationHandlerMapping(applicationContext, handlerConverter));
 
         dispatcherServlet.addHandlerAdapter(new ControllerHandlerAdapter());
         dispatcherServlet.addHandlerAdapter(new HandlerExecutionHandlerAdapter());
+
+        dispatcherServlet.addExceptionHandlerMapping(new ExceptionHandlerMapping(applicationContext, exceptionHandlerConverter));
 
         final var dispatcher = container.addServlet("dispatcher", dispatcherServlet);
         dispatcher.setLoadOnStartup(1);
