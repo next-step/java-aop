@@ -53,7 +53,7 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         BeanDefinition beanDefinition = beanDefinitions.get(clazz);
         if (beanDefinition instanceof AnnotatedBeanDefinition annotatedBeanDefinition) {
             bean = getObjectForBeanInstance(createAnnotatedBean(annotatedBeanDefinition));
-            bean = postInitializationIfNecessary(bean);
+            bean = postProcessIfNecessary(bean);
 
             beans.put(bean.getClass(), bean);
             initialize(bean, clazz);
@@ -69,14 +69,26 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         log.debug("BeanDefinition : {}", beanDefinition);
 
         bean = getObjectForBeanInstance(inject(beanDefinition));
-        bean = postInitializationIfNecessary(bean);
+        bean = postProcessIfNecessary(bean);
         beans.put(bean.getClass(), bean);
 
         initialize(bean, concreteClazz.get());
         return (T) bean;
     }
 
-    private Object postInitializationIfNecessary(Object bean) {
+    private Object getObjectForBeanInstance(final Object beanInstance) {
+        if (beanInstance instanceof FactoryBean<?> factoryBean) {
+            try {
+                return factoryBean.getObject();
+            } catch (Exception e) {
+                throw new RuntimeException("FactoryBean.getObject() 실행 실패", e);//fixme: 커스터마이징
+            }
+        }
+
+        return beanInstance;
+    }
+
+    private Object postProcessIfNecessary(Object bean) {
         if (hasTransactionalAnnotationAtLeastOne(bean)) {
             TransactionProxyCreator transactionProxyCreator = new TransactionProxyCreator(getBean(DataSource.class));
             bean = transactionProxyCreator.postInitialization(bean);
@@ -96,18 +108,6 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
     private boolean hasAnnotationOnMethod(final Class<?> beanType) {
         return Arrays.stream(beanType.getDeclaredMethods())
                 .anyMatch(method -> method.getAnnotation(Transactional.class) != null);
-    }
-
-    private Object getObjectForBeanInstance(final Object beanInstance) {
-        if (beanInstance instanceof FactoryBean<?> factoryBean) {
-            try {
-                return factoryBean.getObject();
-            } catch (Exception e) {
-                throw new RuntimeException("FactoryBean.getObject() 실행 실패", e);
-            }
-        }
-
-        return beanInstance;
     }
 
     private void initialize(Object bean, Class<?> beanClass) {
