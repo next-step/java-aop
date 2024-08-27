@@ -16,6 +16,7 @@ class ProxyFactoryBeanTest {
             return "Hello, %s".formatted(result);
         };
         ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean(ProxyTarget.class);
+        proxyFactoryBean.addMethodInterceptor(methodInterceptor);
 
         ProxyTarget proxyTarget = (ProxyTarget) proxyFactoryBean.getObject();
 
