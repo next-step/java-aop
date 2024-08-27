@@ -79,6 +79,8 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
             }
         }
 
+        // 빈 후처리기를 통해서 프록시 적용 대상인지 확인하고 대상인 경우 프록시를 생성한다
+
         return beanInstance;
     }
 

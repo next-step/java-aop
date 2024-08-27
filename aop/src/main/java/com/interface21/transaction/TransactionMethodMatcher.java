@@ -10,11 +10,11 @@ public class TransactionMethodMatcher implements MethodMatcher {
         return hasTransactionalAnnotations(targetClass) || hasTransactionalAnnotations(m);
     }
 
-    private boolean hasTransactionalAnnotations(final Class<?> targetClass) {
+    public boolean hasTransactionalAnnotations(final Class<?> targetClass) {
         return targetClass.getAnnotation(Transactional.class) != null;
     }
 
-    private boolean hasTransactionalAnnotations(final Method method) {
+    public boolean hasTransactionalAnnotations(final Method method) {
         return method.getAnnotation(Transactional.class) != null;
     }
 }
