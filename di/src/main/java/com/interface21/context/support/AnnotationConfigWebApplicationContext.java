@@ -1,5 +1,6 @@
 package com.interface21.context.support;
 
+import com.interface21.beans.factory.config.BeanPostProcessor;
 import com.interface21.beans.factory.support.DefaultListableBeanFactory;
 import com.interface21.context.ApplicationContext;
 import com.interface21.context.annotation.AnnotatedBeanDefinitionReader;
@@ -55,5 +56,10 @@ public class AnnotationConfigWebApplicationContext implements ApplicationContext
     @Override
     public Set<Class<?>> getBeanClasses() {
         return beanFactory.getBeanClasses();
+    }
+
+    @Override
+    public void addBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
+        beanFactory.addBeanPostProcessor(beanPostProcessor);
     }
 }

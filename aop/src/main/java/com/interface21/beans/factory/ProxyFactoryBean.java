@@ -1,12 +1,19 @@
 package com.interface21.beans.factory;
 
-import com.interface21.framework.ProxyFactory;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
 
 public class ProxyFactoryBean<T> implements FactoryBean {
 
     private Class<T> target;
     private Advice advice;
     private PointCut pointCut;
+
+    public ProxyFactoryBean(Class<T> target, Advice advice, PointCut pointCut) {
+        this.target = target;
+        this.advice = advice;
+        this.pointCut = pointCut;
+    }
 
     public void setTarget(Class<T> target) {
         this.target = target;
@@ -22,7 +29,21 @@ public class ProxyFactoryBean<T> implements FactoryBean {
 
     @Override
     public T getObject() {
-        ProxyFactory<T> proxyFactory = new ProxyFactory<>(target, advice, pointCut);
-        return proxyFactory.getProxy();
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(target);
+        enhancer.setCallback(methodInterceptor());
+        return (T) enhancer.create();
+    }
+
+    private MethodInterceptor methodInterceptor() {
+        return (object, method, args, methodProxy) -> {
+            Object result;
+            if (pointCut.matches(method)) {
+                result = advice.around(new ProceedingJoinPoint(object, method, args));
+            } else {
+                result = methodProxy.invokeSuper(object, args);
+            }
+            return result;
+        };
     }
 }

@@ -74,8 +74,8 @@ class SpringAOP : FreeSpec({
 
             val proxy = proxyFactory.proxy as World
 
-            target.message shouldBe ""
-            proxy.message shouldBe ""
+            target.message shouldBe "World"
+            proxy.message shouldBe "Hello, World!"
         }
 
         """
@@ -100,7 +100,7 @@ class SpringAOP : FreeSpec({
 
                 // proxy.message를 호출하면 HelloBeforeAdvice의 before 메서드가 실행됩니다.
                 // 콘솔창 메시지를 확인하세요.
-                proxy.message shouldBe ""
+                proxy.message shouldBe "World"
             }
 
             """
@@ -116,7 +116,7 @@ class SpringAOP : FreeSpec({
 
                 // proxy.message를 호출하면 HelloAfterReturningAdvice의 before 메서드가 실행됩니다.
                 // 콘솔창 메시지를 확인하세요.
-                proxy.message shouldBe ""
+                proxy.message shouldBe "World"
             }
 
             """
@@ -137,13 +137,13 @@ class SpringAOP : FreeSpec({
                     // 콘솔창 메시지를 확인하세요.
                     proxy.exception()
                 }
-                exception.message shouldBe ""
+                exception.message shouldBe "Generic Exception"
 
                 val illegalArgumentException = shouldThrow<IllegalArgumentException> {
                     // 콘솔창 메시지를 확인하세요.
                     proxy.illegalArgumentException()
                 }
-                illegalArgumentException.message shouldBe ""
+                illegalArgumentException.message shouldBe "IllegalArgument Exception"
             }
         }
 
@@ -172,7 +172,7 @@ class SpringAOP : FreeSpec({
                 proxyFactory.setTarget(target)
                 val proxy = proxyFactory.proxy as World
 
-                proxy.message shouldBe ""
+                proxy.message shouldBe "Hello, World!"
             }
 
             """
@@ -190,7 +190,7 @@ class SpringAOP : FreeSpec({
                 proxyFactory.setTarget(target)
                 val proxy = proxyFactory.proxy as World
 
-                proxy.message shouldBe ""
+                proxy.message shouldBe "Hello, World!"
             }
 
             """
@@ -210,8 +210,8 @@ class SpringAOP : FreeSpec({
                 proxyFactory.setTarget(sampleBean)
                 val proxy = proxyFactory.proxy as SampleBean
 
-                proxy.dynamicPointcut(1) shouldBe ""
-                proxy.dynamicPointcut(100) shouldBe ""
+                proxy.dynamicPointcut(1) shouldBe "Hello, Invoked dynamicPointcut(1)!"
+                proxy.dynamicPointcut(100) shouldBe "Invoked dynamicPointcut(100)"
             }
 
             """
@@ -229,7 +229,7 @@ class SpringAOP : FreeSpec({
                 proxyFactory.setTarget(target)
                 val proxy = proxyFactory.proxy as World
 
-                proxy.message shouldBe ""
+                proxy.message shouldBe "Hello, World!"
             }
 
             """
@@ -246,7 +246,7 @@ class SpringAOP : FreeSpec({
                 proxyFactory.setTarget(sampleBean)
                 val proxy = proxyFactory.proxy as SampleBean
 
-                proxy.annotationPointcut() shouldBe ""
+                proxy.annotationPointcut() shouldBe "Hello, Invoked annotationPointcut()!"
             }
         }
     }

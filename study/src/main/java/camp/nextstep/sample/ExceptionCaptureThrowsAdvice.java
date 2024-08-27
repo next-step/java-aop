@@ -1,11 +1,10 @@
 package camp.nextstep.sample;
 
-import org.springframework.aop.ThrowsAdvice;
-import org.springframework.web.bind.annotation.RestController;
-
 import java.lang.reflect.Method;
+import org.springframework.aop.ThrowsAdvice;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 
-@RestController
+@ControllerAdvice
 public class ExceptionCaptureThrowsAdvice implements ThrowsAdvice {
 
     public void afterThrowing(Exception ex) throws Throwable {
