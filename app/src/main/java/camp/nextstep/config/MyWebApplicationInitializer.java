@@ -34,6 +34,8 @@ public class MyWebApplicationInitializer implements WebApplicationInitializer {
         dispatcher.setLoadOnStartup(1);
         dispatcher.addMapping("/");
 
+        container.setAttribute("applicationContext", applicationContext);
+
         log.info("Start AppWebApplication Initializer");
     }
 }

@@ -2,6 +2,7 @@ package com.interface21.beans.factory.support;
 
 import com.interface21.beans.BeanInstantiationException;
 import com.interface21.beans.BeanUtils;
+import com.interface21.beans.factory.BeanFactory;
 import com.interface21.beans.factory.ConfigurableListableBeanFactory;
 import com.interface21.beans.factory.FactoryBean;
 import com.interface21.beans.factory.config.BeanDefinition;
@@ -31,6 +32,8 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
 
     @Override
     public void preInstantiateSingletons() {
+        registerBean(BeanFactory.class, this);
+
         for (Class<?> clazz : getBeanClasses()) {
             getBean(clazz);
         }
