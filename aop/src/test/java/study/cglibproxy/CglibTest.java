@@ -1,6 +1,7 @@
 package study.cglibproxy;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -32,7 +33,6 @@ public class CglibTest {
     @Test
     void createProxy() {
         Enhancer enhancer = new Enhancer();
-        enhancer.setUseCache(false);
         enhancer.setSuperclass(HelloTarget.class);
         enhancer.setCallback(new UppercaseMethodInterceptor(new SayMethodMatcher()));
 
@@ -65,7 +65,6 @@ public class CglibTest {
     @Test
     void createProxy3() {
         Enhancer enhancer = new Enhancer();
-        enhancer.setUseCache(false);
         enhancer.setSuperclass(ConstructorTarget.class);
         enhancer.setCallback(new UppercaseMethodInterceptor(new SayMethodMatcher()));
 
@@ -90,7 +89,6 @@ public class CglibTest {
         };
 
         Enhancer enhancer = new Enhancer();
-        enhancer.setUseCache(false);
         enhancer.setSuperclass(ConstructorTarget.class);
         enhancer.setCallback(pingUppercaseMethodInterceptor);
 
@@ -100,5 +98,54 @@ public class CglibTest {
                 () -> assertThat(proxy.sayName()).isEqualTo("park"),
                 () -> assertThat(proxy.pingPong()).isEqualTo("PING PONG")
         );
+    }
+
+    public static class Target {
+        private String name;
+
+        public Target(final String name) {
+            this.name = name;
+        }
+    }
+
+    @DisplayName("CGLIB은 실패 결과를 캐시한다.")
+    @Test
+    void createProxy5() {
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(Target.class);
+        enhancer.setCallback(new UppercaseMethodInterceptor(new SayMethodMatcher()));
+
+        assertThatThrownBy(enhancer::create)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Superclass has no null constructors but no arguments were given");
+
+        Enhancer enhancer2 = new Enhancer();
+        enhancer2.setSuperclass(Target.class);
+        enhancer2.setCallback(new UppercaseMethodInterceptor(new SayMethodMatcher()));
+
+        // 해당하는 생성자가 있음에도 생성자가 없다는 예외가 발생한다.
+        assertThatThrownBy(() -> enhancer2.create(new Class[]{String.class}, new Object[]{"kim"}))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Superclass has no null constructors but no arguments were given");
+    }
+
+    @DisplayName("useCache 옵션을 false로 주면 CGLIB은 실패 결과를 캐시하지 않는다.")
+    @Test
+    void createProxy6() {
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(Target.class);
+        enhancer.setCallback(new UppercaseMethodInterceptor(new SayMethodMatcher()));
+
+        assertThatThrownBy(enhancer::create)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Superclass has no null constructors but no arguments were given");
+
+        Enhancer enhancer2 = new Enhancer();
+        enhancer2.setUseCache(false);
+        enhancer2.setSuperclass(Target.class);
+        enhancer2.setCallback(new UppercaseMethodInterceptor(new SayMethodMatcher()));
+
+        assertThatCode(() -> enhancer2.create(new Class[]{String.class}, new Object[]{"kim"}))
+                .doesNotThrowAnyException();
     }
 }
