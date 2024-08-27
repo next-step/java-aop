@@ -32,6 +32,7 @@ public class CglibTest {
     @Test
     void createProxy() {
         Enhancer enhancer = new Enhancer();
+        enhancer.setUseCache(false);
         enhancer.setSuperclass(HelloTarget.class);
         enhancer.setCallback(new UppercaseMethodInterceptor(new SayMethodMatcher()));
 
@@ -51,6 +52,7 @@ public class CglibTest {
     @Test
     void createProxy2() {
         Enhancer enhancer = new Enhancer();
+        enhancer.setUseCache(false);
         enhancer.setSuperclass(ConstructorTarget.class);
         enhancer.setCallback(new UppercaseMethodInterceptor(new SayMethodMatcher()));
 
@@ -63,6 +65,7 @@ public class CglibTest {
     @Test
     void createProxy3() {
         Enhancer enhancer = new Enhancer();
+        enhancer.setUseCache(false);
         enhancer.setSuperclass(ConstructorTarget.class);
         enhancer.setCallback(new UppercaseMethodInterceptor(new SayMethodMatcher()));
 
@@ -87,6 +90,7 @@ public class CglibTest {
         };
 
         Enhancer enhancer = new Enhancer();
+        enhancer.setUseCache(false);
         enhancer.setSuperclass(ConstructorTarget.class);
         enhancer.setCallback(pingUppercaseMethodInterceptor);
 
