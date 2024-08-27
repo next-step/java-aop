@@ -29,11 +29,12 @@ class ExceptionHandlerMappingTest {
     }
 
     @Test
-    void 예외에_맞는_핸들러를_못가져오는_경우_예외를_그대로_던진다() {
+    void 예외에_맞는_핸들러를_못가져오는_경우_예외를_던진다() {
         ExceptionHandlerMapping exceptionHandlerMapping = new ExceptionHandlerMapping(applicationContext, exceptionHandlerConverter);
         exceptionHandlerMapping.initialize();
         assertThatThrownBy(() -> exceptionHandlerMapping.getHandler(new IllegalAccessException()))
-                .isInstanceOf(IllegalAccessException.class);
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("처리가능한 exception handler가 없습니다");
     }
 
     @Test

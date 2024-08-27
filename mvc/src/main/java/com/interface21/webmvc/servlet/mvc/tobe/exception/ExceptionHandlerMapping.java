@@ -31,10 +31,15 @@ public class ExceptionHandlerMapping {
                 .collect(Collectors.toMap(clazz -> clazz, applicationContext::getBean));
     }
 
-    public HandlerExecution getHandler(Throwable exception) throws Throwable {
+    public boolean accept(Throwable exception) {
+        ExceptionHandlerKey handlerKey = new ExceptionHandlerKey(exception);
+        return handlerExecutions.containsKey(handlerKey);
+    }
+
+    public HandlerExecution getHandler(Throwable exception) {
         ExceptionHandlerKey handlerKey = new ExceptionHandlerKey(exception);
         if (!handlerExecutions.containsKey(handlerKey)) {
-            throw exception;
+            throw new IllegalArgumentException("처리가능한 exception handler가 없습니다");
         }
         return handlerExecutions.get(handlerKey);
     }
