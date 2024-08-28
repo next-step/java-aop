@@ -195,3 +195,14 @@ public class SomeClass {
     - AfterReturningAdvice 는 메서드가 실행 된 후 로직 정의
 - Advisor
     - Advice 와 PointCut 을 가지고 어떤 Advice 를 언제 어디에 적용할지를 결정한다
+
+## 3단계 - @Transactional 구현하기
+
+### 요구사항
+
+- 트랜잭션 처리를 하고 싶은 메서드에 @Transactional을 추가하면 트랜잭션 처리가 가능하도록 한다.
+- UserService 인터페이스를 삭제하고, AppUserService 클래스를 UserService로 이름을 변경한다.
+- TxUserService 클래스의 트랜잭션 처리 로직을 cglib 프록시로 옮기고, TxUserService 클래스를 삭제한다.
+- FactoryBean을 사용하여 프록시를 생성하도록 만든다.
+- 앞 단계에서 구현한 Bean 컨테이너가 Bean을 생성할 때 @Transactional 애노테이션이 클래스/메소드 레벨에 설정되어 있으면
+  Transaction 처리를 할 수 있는 Proxy 를 생성한다.

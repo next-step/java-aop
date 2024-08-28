@@ -31,13 +31,33 @@ public class ProxyFactoryBean<T> implements FactoryBean<T> {
         return (T) enhancer.create();
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public T getObject(final Class<?>[] argumentTypes, final Object[] arguments) {
+        final Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(clazz);
+        enhancer.setCallback(createBeanMethodInterceptor());
+        return (T) enhancer.create(argumentTypes, arguments);
+    }
+
+    @Override
+    public Class<T> getType() {
+        return clazz;
+    }
+
     private MethodInterceptor createBeanMethodInterceptor() {
         return (o, method, objects, methodProxy) -> {
             final List<Advice> advice = getTargetAdvice(method, objects);
 
             executeBeforeAdvices(advice, method, objects, methodProxy);
 
-            final Object result = methodProxy.invokeSuper(o, objects);
+            final Object result;
+            try {
+                result = methodProxy.invokeSuper(o, objects);
+            } catch (final Exception e) {
+                executeAfterThrowing(advice, method, objects, methodProxy, e);
+                throw e;
+            }
 
             executeAfterAdvices(advice, method, objects, methodProxy, result);
 
@@ -57,6 +77,14 @@ public class ProxyFactoryBean<T> implements FactoryBean<T> {
         for (final Advice targetAdvice : advice) {
             if (targetAdvice instanceof final AfterReturningAdvice afterReturningAdvice) {
                 afterReturningAdvice.afterReturning(result, method, objects, methodProxy);
+            }
+        }
+    }
+
+    private void executeAfterThrowing(final List<Advice> advice, final Method method, final Object[] objects, final MethodProxy methodProxy, final Exception e) {
+        for (final Advice targetAdvice : advice) {
+            if (targetAdvice instanceof final ThrowsAdvice throwsAdvice) {
+                throwsAdvice.afterThrowing(e, method, objects, methodProxy);
             }
         }
     }

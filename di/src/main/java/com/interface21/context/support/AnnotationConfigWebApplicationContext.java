@@ -5,6 +5,7 @@ import com.interface21.context.ApplicationContext;
 import com.interface21.context.annotation.AnnotatedBeanDefinitionReader;
 import com.interface21.context.annotation.ClassPathBeanDefinitionScanner;
 import com.interface21.context.annotation.ComponentScan;
+import com.interface21.transaction.interceptor.TransactionProxyBeanPostProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +30,7 @@ public class AnnotationConfigWebApplicationContext implements ApplicationContext
             final var scanner = new ClassPathBeanDefinitionScanner(beanFactory);
             scanner.doScan(basePackages);
         }
+        beanFactory.addBeanPostProcessor(new TransactionProxyBeanPostProcessor(beanFactory));
         beanFactory.preInstantiateSingletons();
     }
 

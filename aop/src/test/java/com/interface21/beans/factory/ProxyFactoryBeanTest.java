@@ -20,6 +20,19 @@ class ProxyFactoryBeanTest {
     }
 
     @Test
+    @DisplayName("argumentTypes 와 arguments 를 사용하여 기본 생성자가 없는 프록시 객체를 생성할 수 있다.")
+    void proxyCreationWithoutNoArgConstructorTest() {
+        final ProxyFactoryBean<FakeClassWithoutNoArgConstructor> factoryBean = new ProxyFactoryBean<>(FakeClassWithoutNoArgConstructor.class);
+
+        final Class<?>[] argumentTypes = new Class<?>[]{String.class};
+        final Object[] arguments = new Object[]{"jongmin"};
+
+        final FakeClassWithoutNoArgConstructor proxy = factoryBean.getObject(argumentTypes, arguments);
+
+        assertThat(proxy.sayHello()).isEqualTo("Hello jongmin");
+    }
+
+    @Test
     @DisplayName("프록시 객체가 기존 객체의 메서드를 호출할 수 있다.")
     void proxyMethodInvocationTest() {
         final ProxyFactoryBean<FakeClass> factoryBean = new ProxyFactoryBean<>(FakeClass.class);
@@ -76,6 +89,27 @@ class ProxyFactoryBeanTest {
         assertThat(beforeAdvice.isBeforeCalled()).isFalse();
     }
 
+
+    @Test
+    @DisplayName("ThrowsAdvice 가 정상적으로 호출된다.")
+    void throwsAdviceTest() {
+        final ProxyFactoryBean<FakeClass> factoryBean = new ProxyFactoryBean<>(FakeClass.class);
+        final FakeThrowsAdvice throwsAdvice = new FakeThrowsAdvice();
+        final ExceptionPointCut pointCut = new ExceptionPointCut();
+        final DefaultAdvisor advisor = new DefaultAdvisor(throwsAdvice, pointCut);
+        factoryBean.addAdvisors(advisor);
+
+        final FakeClass proxy = factoryBean.getObject();
+
+        try {
+            proxy.exception();
+        } catch (final Exception ignored) {
+
+        }
+
+        assertThat(throwsAdvice.isAfterCalled()).isTrue();
+    }
+
     static class FakeClass {
         public String sayHello() {
             return "Hello";
@@ -83,6 +117,22 @@ class ProxyFactoryBeanTest {
 
         public String sayBye() {
             return "Bye";
+        }
+
+        public String exception() {
+            throw new RuntimeException();
+        }
+    }
+
+    static class FakeClassWithoutNoArgConstructor {
+        private final String name;
+
+        public FakeClassWithoutNoArgConstructor(final String name) {
+            this.name = name;
+        }
+
+        public String sayHello() {
+            return "Hello " + name;
         }
     }
 
@@ -112,10 +162,30 @@ class ProxyFactoryBeanTest {
         }
     }
 
+    static class FakeThrowsAdvice implements ThrowsAdvice {
+        private boolean afterCalled = false;
+
+        @Override
+        public void afterThrowing(final Exception ex, final Method method, final Object[] args, final Object target) {
+            afterCalled = true;
+        }
+
+        public boolean isAfterCalled() {
+            return afterCalled;
+        }
+    }
+
     static class SayHelloPointCut implements PointCut {
         @Override
         public MethodMatcher getMethodMatcher() {
             return (method, targetClass, args) -> method.getName().equals("sayHello");
+        }
+    }
+
+    static class ExceptionPointCut implements PointCut {
+        @Override
+        public MethodMatcher getMethodMatcher() {
+            return (method, targetClass, args) -> method.getName().equals("exception");
         }
     }
 }

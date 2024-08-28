@@ -5,6 +5,7 @@ import com.interface21.beans.BeanUtils;
 import com.interface21.beans.factory.ConfigurableListableBeanFactory;
 import com.interface21.beans.factory.FactoryBean;
 import com.interface21.beans.factory.config.BeanDefinition;
+import com.interface21.beans.factory.config.BeanPostProcessor;
 import com.interface21.context.annotation.AnnotatedBeanDefinition;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
@@ -13,7 +14,12 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 public class DefaultListableBeanFactory implements BeanDefinitionRegistry, ConfigurableListableBeanFactory {
 
@@ -22,6 +28,8 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
     private final Map<Class<?>, Object> beans = new HashMap<>();
 
     private final Map<Class<?>, BeanDefinition> beanDefinitions = new HashMap<>();
+
+    private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
 
     @Override
     public void preInstantiateSingletons() {
@@ -59,16 +67,30 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         beanDefinition = beanDefinitions.get(concreteClazz.get());
         log.debug("BeanDefinition : {}", beanDefinition);
         bean = inject(beanDefinition);
+        bean = postProcess(bean);
         bean = unwrapIfNecessary(bean);
         beans.put(concreteClazz.get(), bean);
         initialize(bean, concreteClazz.get());
         return (T) bean;
     }
 
+    private Object postProcess(final Object bean) {
+        return beanPostProcessors.stream()
+                .reduce(bean,
+                        (result, processor) -> processor.postInitialization(result),
+                        (unused, processedBean) -> processedBean);
+    }
+
     private Object unwrapIfNecessary(final Object beanInstance) {
         if (beanInstance instanceof final FactoryBean<?> factoryBean) {
             try {
-                return factoryBean.getObject();
+                final Class<?> type = factoryBean.getType();
+                final Constructor<?> injectedConstructor = BeanFactoryUtils.getInjectedConstructor(type);
+                if (injectedConstructor == null) {
+                    return factoryBean.getObject();
+                }
+                final Class<?>[] parameterTypes = injectedConstructor.getParameterTypes();
+                return factoryBean.getObject(parameterTypes, populateArguments(parameterTypes));
             } catch (final Exception e) {
                 log.error(e.getMessage());
                 throw new BeanInstantiationException(beanInstance.getClass(), e.getMessage());
@@ -85,7 +107,7 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         for (Method initializeMethod : initializeMethods) {
             log.debug("@PostConstruct Initialize Method : {}", initializeMethod);
             BeanFactoryUtils.invokeMethod(initializeMethod, bean,
-                populateArguments(initializeMethod.getParameterTypes()));
+                    populateArguments(initializeMethod.getParameterTypes()));
         }
     }
 
@@ -154,5 +176,9 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
     public void registerBeanDefinition(Class<?> clazz, BeanDefinition beanDefinition) {
         log.debug("register bean : {}", clazz);
         beanDefinitions.put(clazz, beanDefinition);
+    }
+
+    public void addBeanPostProcessor(final BeanPostProcessor beanPostProcessor) {
+        beanPostProcessors.add(beanPostProcessor);
     }
 }
