@@ -11,6 +11,7 @@ import com.interface21.jdbc.core.JdbcTemplate;
 import com.interface21.transaction.PlatformTransactionManager;
 import com.interface21.transaction.support.DataSourceTransactionManager;
 import com.interface21.web.method.support.HandlerMethodArgumentResolver;
+import com.interface21.webmvc.servlet.mvc.tobe.ExceptionHandlerConverter;
 import com.interface21.webmvc.servlet.mvc.tobe.HandlerConverter;
 import com.interface21.webmvc.servlet.mvc.tobe.support.HttpRequestArgumentResolver;
 import com.interface21.webmvc.servlet.mvc.tobe.support.HttpResponseArgumentResolver;
@@ -44,6 +45,15 @@ public class MyConfiguration {
         HandlerConverter handlerConverter = new HandlerConverter();
         handlerConverter.setArgumentResolvers(defaultArgumentResolvers());
         return handlerConverter;
+    }
+
+    @Bean
+    public ExceptionHandlerConverter exceptionHandlerConverter() {
+        return new ExceptionHandlerConverter(getDefaultExceptionArgumentResolvers());
+    }
+
+    private List<HandlerMethodArgumentResolver> getDefaultExceptionArgumentResolvers() {
+        return List.of(new HttpRequestArgumentResolver(), new HttpResponseArgumentResolver());
     }
 
     @Bean
