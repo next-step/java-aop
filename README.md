@@ -206,3 +206,20 @@ public class SomeClass {
 - FactoryBean을 사용하여 프록시를 생성하도록 만든다.
 - 앞 단계에서 구현한 Bean 컨테이너가 Bean을 생성할 때 @Transactional 애노테이션이 클래스/메소드 레벨에 설정되어 있으면
   Transaction 처리를 할 수 있는 Proxy 를 생성한다.
+
+## 4단계 - ControllerAdvice, ExceptionHandler 구현하기
+
+### 요구사항
+
+- Controller, ArgumentResolver 와 같은 곳에서 Exception 이 발생할 경우 Exception 을 처리할 수 있어야 한다.
+-  @ControllerAdvice 기능을 추가하여 예외 처리를 한 곳에서 관리할 수 있도록 만들자.
+- ControllerAdvice 의 메소드도 HandlerExecution 의 하나로 생각할 수 있다. 단, Mapping 이 요청 URL 기반이 아니라 Exception 기반이로 매핑한다는 것이 다를 뿐이다.
+```java
+@ControllerAdvice 
+public class MyAdvice { 
+    @ExceptionHandler(DataAccessException.class) 
+    public ModelAndView dataAccessException() { 
+        return jspView("redirect:/index.jsp");
+    }
+}
+```
