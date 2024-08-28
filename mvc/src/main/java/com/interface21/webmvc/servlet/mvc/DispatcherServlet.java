@@ -1,6 +1,7 @@
 package com.interface21.webmvc.servlet.mvc;
 
 import com.interface21.webmvc.servlet.ModelAndView;
+import com.interface21.webmvc.servlet.mvc.tobe.HandlerExceptionResolver;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,11 +16,13 @@ public class DispatcherServlet extends HttpServlet {
 
     private final HandlerMappingRegistry handlerMappingRegistry;
     private final HandlerAdapterRegistry handlerAdapterRegistry;
+    private final HandlerExceptionRegistry handlerExceptionRegistry;
     private HandlerExecutor handlerExecutor;
 
     public DispatcherServlet() {
         this.handlerMappingRegistry = new HandlerMappingRegistry();
         this.handlerAdapterRegistry = new HandlerAdapterRegistry();
+        this.handlerExceptionRegistry = new HandlerExceptionRegistry();
     }
 
     @Override
@@ -33,6 +36,10 @@ public class DispatcherServlet extends HttpServlet {
 
     public void addHandlerAdapter(final HandlerAdapter handlerAdapter) {
         handlerAdapterRegistry.addHandlerAdapter(handlerAdapter);
+    }
+
+    public void addHandlerExceptionResolver(HandlerExceptionResolver handlerExceptionResolver) {
+        handlerExceptionRegistry.addHandlerExceptionResolver(handlerExceptionResolver);
     }
 
     @Override
@@ -50,7 +57,13 @@ public class DispatcherServlet extends HttpServlet {
             render(modelAndView, request, response);
         } catch (Throwable e) {
             log.error("Exception : {}", e.getMessage(), e);
-            throw new ServletException(e.getMessage());
+            ModelAndView modelAndView = handlerExceptionRegistry.handle(request, response, e)
+                                                                .orElseThrow(() -> new ServletException(e.getMessage()));
+            try {
+                render(modelAndView, request, response);
+            } catch (Exception ex) {
+                throw new ServletException(ex);
+            }
         }
     }
 
