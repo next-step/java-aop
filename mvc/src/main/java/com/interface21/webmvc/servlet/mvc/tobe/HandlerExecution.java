@@ -75,4 +75,8 @@ public class HandlerExecution {
 
         throw new IllegalStateException("No suitable resolver for argument: " + methodParameter.getType());
     }
+
+    public Method getMethod() {
+        return method;
+    }
 }

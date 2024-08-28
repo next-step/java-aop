@@ -2,10 +2,7 @@ package com.interface21.context.annotation;
 
 import com.interface21.beans.factory.support.BeanDefinitionRegistry;
 import com.interface21.beans.factory.support.GenericBeanDefinition;
-import com.interface21.context.stereotype.Component;
-import com.interface21.context.stereotype.Controller;
-import com.interface21.context.stereotype.Repository;
-import com.interface21.context.stereotype.Service;
+import com.interface21.context.stereotype.*;
 import org.reflections.Reflections;
 
 import java.lang.annotation.Annotation;
@@ -23,7 +20,7 @@ public class ClassPathBeanDefinitionScanner {
     @SuppressWarnings("unchecked")
     public void doScan(Object... basePackages) {
         Reflections reflections = new Reflections(basePackages);
-        Set<Class<?>> beanClasses = getTypesAnnotatedWith(reflections, Controller.class, Service.class,
+        Set<Class<?>> beanClasses = getTypesAnnotatedWith(reflections, ControllerAdvice.class, Controller.class, Service.class,
             Repository.class, Component.class);
         for (Class<?> clazz : beanClasses) {
             beanDefinitionRegistry.registerBeanDefinition(clazz, new GenericBeanDefinition(clazz));

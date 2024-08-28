@@ -1,12 +1,16 @@
 package com.interface21.webmvc.servlet.mvc;
 
 import com.interface21.webmvc.servlet.ModelAndView;
+import com.interface21.webmvc.servlet.mvc.tobe.exception.ExceptionHandlerMapping;
+import com.interface21.webmvc.servlet.mvc.tobe.exception.ExceptionHandlerMappingRegistry;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.InvocationTargetException;
 
 public class DispatcherServlet extends HttpServlet {
 
@@ -15,11 +19,13 @@ public class DispatcherServlet extends HttpServlet {
 
     private final HandlerMappingRegistry handlerMappingRegistry;
     private final HandlerAdapterRegistry handlerAdapterRegistry;
+    private final ExceptionHandlerMappingRegistry exceptionHandlerMappingRegistry;
     private HandlerExecutor handlerExecutor;
 
     public DispatcherServlet() {
         this.handlerMappingRegistry = new HandlerMappingRegistry();
         this.handlerAdapterRegistry = new HandlerAdapterRegistry();
+        this.exceptionHandlerMappingRegistry = new ExceptionHandlerMappingRegistry();
     }
 
     @Override
@@ -35,6 +41,10 @@ public class DispatcherServlet extends HttpServlet {
         handlerAdapterRegistry.addHandlerAdapter(handlerAdapter);
     }
 
+    public void addExceptionHandlerMapping(final ExceptionHandlerMapping exceptionHandlerMapping) {
+        exceptionHandlerMappingRegistry.addExceptionHandlerMapping(exceptionHandlerMapping);
+    }
+
     @Override
     protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException {
         log.debug("Method : {}, Request URI : {}", request.getMethod(), request.getRequestURI());
@@ -48,9 +58,22 @@ public class DispatcherServlet extends HttpServlet {
 
             final var modelAndView = handlerExecutor.handle(request, response, handler.get());
             render(modelAndView, request, response);
-        } catch (Throwable e) {
-            log.error("Exception : {}", e.getMessage(), e);
-            throw new ServletException(e.getMessage());
+        } catch (InvocationTargetException e) {
+            handleException(request, response, e.getTargetException());
+        } catch (Exception e) {
+            handleException(request, response, e);
+        }
+    }
+
+    private void handleException(HttpServletRequest request, HttpServletResponse response, Throwable e) throws ServletException {
+        log.error("Exception : {}", e.getMessage(), e);
+
+        try {
+            request.setAttribute("exception", e);
+            ModelAndView modelAndView = handlerExecutor.handle(request, response, exceptionHandlerMappingRegistry.getHandler(e));
+            render(modelAndView, request, response);
+        } catch (Throwable ex) {
+            throw new ServletException(ex.getMessage());
         }
     }
 
