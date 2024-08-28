@@ -1,11 +1,10 @@
-package com.interface21.beans.config;
+package com.interface21.transaction;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import samples.FakeTransactionManager;
 import samples.TransactionState;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class TransactionRollbackAdviceTest {
 
@@ -19,6 +18,6 @@ class TransactionRollbackAdviceTest {
         transactionRollbackAdvice.afterThrowing(new RuntimeException());
 
         // then
-        assertThat(transactionManager.getState()).isEqualTo(TransactionState.ROLLBACK);
+        Assertions.assertThat(transactionManager.getState()).isEqualTo(TransactionState.ROLLBACK);
     }
 }

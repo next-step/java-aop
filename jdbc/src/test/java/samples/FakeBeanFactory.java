@@ -1,7 +1,7 @@
 package samples;
 
+import com.interface21.beans.config.BeanPostProcessor;
 import com.interface21.beans.factory.BeanFactory;
-import com.interface21.beans.factory.config.BeanPostProcessor;
 import com.interface21.transaction.PlatformTransactionManager;
 
 import java.util.HashMap;

@@ -1,8 +1,7 @@
 package com.interface21.context.support;
 
+import com.interface21.beans.config.BeanFactoryBeanPostProcessor;
 import com.interface21.beans.config.BeanPostConstructProcessor;
-import com.interface21.beans.config.TransactionBeanPostProcessor;
-import com.interface21.beans.factory.config.BeanFactoryBeanPostProcessor;
 import com.interface21.beans.factory.support.DefaultListableBeanFactory;
 import com.interface21.context.ApplicationContext;
 import com.interface21.context.annotation.AnnotatedBeanDefinitionReader;
@@ -40,7 +39,6 @@ public class AnnotationConfigWebApplicationContext implements ApplicationContext
         Object[] basePackages = findBasePackages(annotatedClasses);
         beanFactory = new DefaultListableBeanFactory();
         beanFactory.addBeanPostProcessor(new BeanPostConstructProcessor(beanFactory));
-        beanFactory.addBeanPostProcessor(new TransactionBeanPostProcessor(beanFactory));
         final var beanDefinitionReader = new AnnotatedBeanDefinitionReader(beanFactory);
         beanDefinitionReader.loadBeanDefinitions(annotatedClasses);
 

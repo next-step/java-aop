@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-    implementation project(':jdbc')
+    implementation project(':di')
 
     implementation 'org.reflections:reflections:0.10.2'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.1'

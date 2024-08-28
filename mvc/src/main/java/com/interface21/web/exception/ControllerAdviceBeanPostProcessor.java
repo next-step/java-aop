@@ -1,10 +1,10 @@
 package com.interface21.web.exception;
 
 import com.interface21.beans.factory.BeanFactory;
-import com.interface21.beans.factory.config.BeanFactoryBeanPostProcessor;
+import com.interface21.beans.config.BeanFactoryBeanPostProcessor;
 import com.interface21.web.bind.annotation.ControllerAdvice;
 
-public class ControllerAdviceBeanPostProcessor extends BeanFactoryBeanPostProcessor {
+public class ControllerAdviceBeanPostProcessor implements BeanFactoryBeanPostProcessor {
 
     private BeanFactory beanFactory;
 
@@ -23,8 +23,8 @@ public class ControllerAdviceBeanPostProcessor extends BeanFactoryBeanPostProces
     }
 
     @Override
-    public void injectBeanFactory(final Object beanFactory) {
-        this.beanFactory = (BeanFactory) beanFactory;
+    public void injectBeanFactory(final BeanFactory beanFactory) {
+        this.beanFactory = beanFactory;
     }
 
     private boolean isControllerAdvice(final Class<?> clazz) {

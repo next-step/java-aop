@@ -1,7 +1,7 @@
-package com.interface21.beans.config;
+package com.interface21.transaction;
 
 import com.interface21.beans.factory.ProxyFactoryBean;
-import com.interface21.transaction.PlatformTransactionManager;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import samples.FakeBeanFactory;
@@ -9,7 +9,6 @@ import samples.FakeTransactionManager;
 import samples.TxMethodTestService;
 import samples.TxTypeTestService;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -21,7 +20,8 @@ class TransactionBeanPostProcessorTest {
         // given
         final FakeBeanFactory beanFactory = new FakeBeanFactory();
         final FakeTransactionManager transactionManager = (FakeTransactionManager) beanFactory.getBean(PlatformTransactionManager.class);
-        final TransactionBeanPostProcessor beanPostProcessor = new TransactionBeanPostProcessor(beanFactory);
+        final TransactionBeanPostProcessor beanPostProcessor = new TransactionBeanPostProcessor();
+        beanPostProcessor.injectBeanFactory(beanFactory);
         final TxTypeTestService bean = (TxTypeTestService) ((ProxyFactoryBean) beanPostProcessor.postInitialization(new TxTypeTestService())).getObject();
 
         // when
@@ -29,9 +29,9 @@ class TransactionBeanPostProcessorTest {
 
         // then
         assertAll(
-                () -> assertThat(transactionManager.isBegan()).isTrue(),
-                () -> assertThat(transactionManager.isCommited()).isTrue(),
-                () -> assertThat(transactionManager.isRollBacked()).isFalse()
+                () -> Assertions.assertThat(transactionManager.isBegan()).isTrue(),
+                () -> Assertions.assertThat(transactionManager.isCommited()).isTrue(),
+                () -> Assertions.assertThat(transactionManager.isRollBacked()).isFalse()
         );
     }
 
@@ -41,15 +41,16 @@ class TransactionBeanPostProcessorTest {
         // given
         final FakeBeanFactory beanFactory = new FakeBeanFactory();
         final FakeTransactionManager transactionManager = (FakeTransactionManager) beanFactory.getBean(PlatformTransactionManager.class);
-        final TransactionBeanPostProcessor beanPostProcessor = new TransactionBeanPostProcessor(beanFactory);
+        final TransactionBeanPostProcessor beanPostProcessor = new TransactionBeanPostProcessor();
+        beanPostProcessor.injectBeanFactory(beanFactory);
         final TxTypeTestService bean = (TxTypeTestService) ((ProxyFactoryBean) beanPostProcessor.postInitialization(new TxTypeTestService())).getObject();
 
         // when then
         assertAll(
                 () -> assertThatThrownBy(bean::expectRollBack),
-                () -> assertThat(transactionManager.isBegan()).isTrue(),
-                () -> assertThat(transactionManager.isCommited()).isFalse(),
-                () -> assertThat(transactionManager.isRollBacked()).isTrue()
+                () -> Assertions.assertThat(transactionManager.isBegan()).isTrue(),
+                () -> Assertions.assertThat(transactionManager.isCommited()).isFalse(),
+                () -> Assertions.assertThat(transactionManager.isRollBacked()).isTrue()
         );
     }
 
@@ -59,7 +60,8 @@ class TransactionBeanPostProcessorTest {
         // given
         final FakeBeanFactory beanFactory = new FakeBeanFactory();
         final FakeTransactionManager transactionManager = (FakeTransactionManager) beanFactory.getBean(PlatformTransactionManager.class);
-        final TransactionBeanPostProcessor beanPostProcessor = new TransactionBeanPostProcessor(beanFactory);
+        final TransactionBeanPostProcessor beanPostProcessor = new TransactionBeanPostProcessor();
+        beanPostProcessor.injectBeanFactory(beanFactory);
         final TxMethodTestService bean = (TxMethodTestService) ((ProxyFactoryBean) beanPostProcessor.postInitialization(new TxMethodTestService())).getObject();
 
         // when
@@ -67,9 +69,9 @@ class TransactionBeanPostProcessorTest {
 
         // then
         assertAll(
-                () -> assertThat(transactionManager.isBegan()).isTrue(),
-                () -> assertThat(transactionManager.isCommited()).isTrue(),
-                () -> assertThat(transactionManager.isRollBacked()).isFalse()
+                () -> Assertions.assertThat(transactionManager.isBegan()).isTrue(),
+                () -> Assertions.assertThat(transactionManager.isCommited()).isTrue(),
+                () -> Assertions.assertThat(transactionManager.isRollBacked()).isFalse()
         );
     }
 
@@ -79,15 +81,16 @@ class TransactionBeanPostProcessorTest {
         // given
         final FakeBeanFactory beanFactory = new FakeBeanFactory();
         final FakeTransactionManager transactionManager = (FakeTransactionManager) beanFactory.getBean(PlatformTransactionManager.class);
-        final TransactionBeanPostProcessor beanPostProcessor = new TransactionBeanPostProcessor(beanFactory);
+        final TransactionBeanPostProcessor beanPostProcessor = new TransactionBeanPostProcessor();
+        beanPostProcessor.injectBeanFactory(beanFactory);
         final TxMethodTestService bean = (TxMethodTestService) ((ProxyFactoryBean) beanPostProcessor.postInitialization(new TxMethodTestService())).getObject();
 
         // when then
         assertAll(
                 () -> assertThatThrownBy(bean::expectRollBack),
-                () -> assertThat(transactionManager.isBegan()).isTrue(),
-                () -> assertThat(transactionManager.isCommited()).isFalse(),
-                () -> assertThat(transactionManager.isRollBacked()).isTrue()
+                () -> Assertions.assertThat(transactionManager.isBegan()).isTrue(),
+                () -> Assertions.assertThat(transactionManager.isCommited()).isFalse(),
+                () -> Assertions.assertThat(transactionManager.isRollBacked()).isTrue()
         );
     }
 
@@ -97,7 +100,8 @@ class TransactionBeanPostProcessorTest {
         // given
         final FakeBeanFactory beanFactory = new FakeBeanFactory();
         final FakeTransactionManager transactionManager = (FakeTransactionManager) beanFactory.getBean(PlatformTransactionManager.class);
-        final TransactionBeanPostProcessor beanPostProcessor = new TransactionBeanPostProcessor(beanFactory);
+        final TransactionBeanPostProcessor beanPostProcessor = new TransactionBeanPostProcessor();
+        beanPostProcessor.injectBeanFactory(beanFactory);
         final TxMethodTestService bean = (TxMethodTestService) ((ProxyFactoryBean) beanPostProcessor.postInitialization(new TxMethodTestService())).getObject();
 
         // when
@@ -105,9 +109,9 @@ class TransactionBeanPostProcessorTest {
 
         // then
         assertAll(
-                () -> assertThat(transactionManager.isBegan()).isFalse(),
-                () -> assertThat(transactionManager.isCommited()).isFalse(),
-                () -> assertThat(transactionManager.isRollBacked()).isFalse()
+                () -> Assertions.assertThat(transactionManager.isBegan()).isFalse(),
+                () -> Assertions.assertThat(transactionManager.isCommited()).isFalse(),
+                () -> Assertions.assertThat(transactionManager.isRollBacked()).isFalse()
         );
     }
 

@@ -1,11 +1,11 @@
-package com.interface21.web.code;
+package code;
 
-import com.interface21.beans.factory.BeanFactory;
 import com.interface21.beans.config.BeanPostProcessor;
+import com.interface21.beans.factory.BeanFactory;
 
 import java.util.Set;
 
-public class FakeBeanFactory implements BeanFactory {
+public class EmptyFakeBeanFactory implements BeanFactory {
     @Override
     public Set<Class<?>> getBeanClasses() {
         return Set.of();

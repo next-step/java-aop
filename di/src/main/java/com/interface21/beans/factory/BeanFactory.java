@@ -1,6 +1,6 @@
 package com.interface21.beans.factory;
 
-import com.interface21.beans.factory.config.BeanPostProcessor;
+import com.interface21.beans.config.BeanPostProcessor;
 
 import java.util.Set;
 

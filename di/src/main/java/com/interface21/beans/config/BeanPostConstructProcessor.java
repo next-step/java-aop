@@ -1,7 +1,6 @@
 package com.interface21.beans.config;
 
 import com.interface21.beans.factory.BeanFactory;
-import com.interface21.beans.factory.config.BeanPostProcessor;
 import com.interface21.beans.factory.support.BeanFactoryUtils;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;

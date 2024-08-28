@@ -1,22 +1,17 @@
-package com.interface21.beans.config;
+package com.interface21.transaction;
 
+import com.interface21.beans.config.BeanFactoryBeanPostProcessor;
 import com.interface21.beans.factory.BeanFactory;
 import com.interface21.beans.factory.ProxyFactoryBean;
-import com.interface21.beans.factory.config.BeanPostProcessor;
 import com.interface21.beans.factory.proxy.*;
-import com.interface21.transaction.PlatformTransactionManager;
 import com.interface21.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 
-public class TransactionBeanPostProcessor implements BeanPostProcessor {
+public class TransactionBeanPostProcessor implements BeanFactoryBeanPostProcessor {
 
-    private final BeanFactory beanFactory;
+    private BeanFactory beanFactory;
     private boolean classLevelTransaction = false;
-
-    public TransactionBeanPostProcessor(final BeanFactory beanFactory) {
-        this.beanFactory = beanFactory;
-    }
 
     @Override
     public Object postInitialization(final Object bean) {
@@ -25,6 +20,11 @@ public class TransactionBeanPostProcessor implements BeanPostProcessor {
         }
 
         return createTransactionProxy(bean);
+    }
+
+    @Override
+    public void injectBeanFactory(final BeanFactory beanFactory) {
+        this.beanFactory = beanFactory;
     }
 
     private boolean hasTransactionalMethods(final Object bean) {

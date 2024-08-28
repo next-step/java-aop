@@ -1,7 +1,7 @@
 package com.interface21.web.code;
 
 import com.interface21.beans.factory.BeanFactory;
-import com.interface21.beans.factory.config.BeanPostProcessor;
+import com.interface21.beans.config.BeanPostProcessor;
 import com.interface21.context.ApplicationContext;
 import com.interface21.web.exception.ExceptionHandlerExceptionResolver;
 
