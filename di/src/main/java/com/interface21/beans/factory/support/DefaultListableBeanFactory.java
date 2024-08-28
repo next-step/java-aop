@@ -2,6 +2,7 @@ package com.interface21.beans.factory.support;
 
 import com.interface21.beans.BeanUtils;
 import com.interface21.beans.factory.ConfigurableListableBeanFactory;
+import com.interface21.beans.factory.FactoryBean;
 import com.interface21.beans.factory.config.BeanDefinition;
 import com.interface21.context.annotation.AnnotatedBeanDefinition;
 import jakarta.annotation.PostConstruct;
@@ -53,13 +54,10 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         if (concreteClazz.isEmpty()) {
             return null;
         }
-
-        beanDefinition = beanDefinitions.get(concreteClazz.get());
-        log.debug("BeanDefinition : {}", beanDefinition);
-        bean = inject(beanDefinition);
-        beans.put(concreteClazz.get(), bean);
-        initialize(bean, concreteClazz.get());
-        return (T) bean;
+        final Object createdBean = createGeneralBean(concreteClazz.get());
+        beans.put(createdBean.getClass(), createdBean);
+        initialize(createdBean, createdBean.getClass());
+        return (T) createdBean;
     }
 
     private void initialize(Object bean, Class<?> beanClass) {
@@ -80,6 +78,21 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         final var bean = getBean(method.getDeclaringClass());
         final var args = populateArguments(method.getParameterTypes());
         return BeanFactoryUtils.invokeMethod(method, bean, args);
+    }
+
+    private Object createGeneralBean(Class<?> aClass) {
+        BeanDefinition beanDefinition = beanDefinitions.get(aClass);
+        log.debug("BeanDefinition : {}", beanDefinition);
+        Object beanInstance = inject(beanDefinition);
+        if (beanInstance instanceof FactoryBean<?> factory) {
+            try {
+                return factory.getObject();
+            } catch (Exception e) {
+                // XXX: 적절한 예외로 변경
+                throw new IllegalStateException(e);
+            }
+        }
+        return beanInstance;
     }
 
     private Object[] populateArguments(Class<?>[] paramTypes) {

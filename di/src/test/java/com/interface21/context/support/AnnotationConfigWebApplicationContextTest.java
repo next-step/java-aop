@@ -1,8 +1,10 @@
 package com.interface21.context.support;
 
 import org.h2.jdbcx.JdbcDataSource;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import samples.DatasourceConfiguration;
+import samples.SampleObject;
 
 import javax.sql.DataSource;
 
@@ -16,5 +18,14 @@ class AnnotationConfigWebApplicationContextTest {
         final var dataSource = applicationContext.getBean(DataSource.class);
         assertThat(dataSource).isInstanceOf(DataSource.class);
         assertThat(dataSource).isInstanceOf(JdbcDataSource.class);
+    }
+
+    @Test
+    @DisplayName("FactoryBean 으로 정의된 빈을 생성할 수 있다.")
+    void factoryBeanTest() {
+        final var applicationContext = new AnnotationConfigWebApplicationContext(DatasourceConfiguration.class);
+        final SampleObject bean = applicationContext.getBean(SampleObject.class);
+        assertThat(bean).isInstanceOf(SampleObject.class);
+        assertThat(bean.name()).isEqualTo("hello");
     }
 }
