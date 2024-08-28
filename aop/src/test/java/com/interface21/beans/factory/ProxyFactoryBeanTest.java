@@ -1,10 +1,10 @@
 package com.interface21.beans.factory;
 
+import code.AopTestBeanFactory;
 import com.interface21.beans.factory.proxy.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
-import samples.FakeBeanFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.*;
 
 class ProxyFactoryBeanTest {
 
-    private final BeanFactory beanFactory = new FakeBeanFactory();
+    private final BeanFactory beanFactory = new AopTestBeanFactory();
 
     @DisplayName("target 클래스의 타입을 반환 한다")
     @Test

@@ -2,10 +2,11 @@ package com.interface21.beans.factory.support;
 
 import com.interface21.beans.BeanInstantiationException;
 import com.interface21.beans.BeanUtils;
+import com.interface21.beans.config.BeanPostProcessor;
+import com.interface21.beans.factory.BeanFactory;
 import com.interface21.beans.factory.ConfigurableListableBeanFactory;
 import com.interface21.beans.factory.FactoryBean;
 import com.interface21.beans.factory.config.BeanDefinition;
-import com.interface21.beans.factory.config.BeanPostProcessor;
 import com.interface21.context.annotation.AnnotatedBeanDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,8 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
 
     @Override
     public void preInstantiateSingletons() {
+        registerBean(BeanFactory.class, this);
+
         for (Class<?> clazz : getBeanClasses()) {
             getBean(clazz);
         }

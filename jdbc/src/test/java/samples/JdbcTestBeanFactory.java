@@ -1,18 +1,18 @@
 package samples;
 
+import com.interface21.beans.config.BeanPostProcessor;
 import com.interface21.beans.factory.BeanFactory;
-import com.interface21.beans.factory.config.BeanPostProcessor;
 import com.interface21.transaction.PlatformTransactionManager;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class FakeBeanFactory implements BeanFactory {
+public class JdbcTestBeanFactory implements BeanFactory {
 
     private final Map<Class<?>, Object> beans = new HashMap<>();
 
-    public FakeBeanFactory() {
+    public JdbcTestBeanFactory() {
         beans.put(PlatformTransactionManager.class, new FakeTransactionManager());
     }
 

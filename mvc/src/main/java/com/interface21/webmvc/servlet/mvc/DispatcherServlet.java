@@ -1,5 +1,6 @@
 package com.interface21.webmvc.servlet.mvc;
 
+import com.interface21.context.ApplicationContext;
 import com.interface21.webmvc.servlet.ModelAndView;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -8,6 +9,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
+
 public class DispatcherServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -15,6 +18,7 @@ public class DispatcherServlet extends HttpServlet {
 
     private final HandlerMappingRegistry handlerMappingRegistry;
     private final HandlerAdapterRegistry handlerAdapterRegistry;
+    private HandlerExceptionRegistry exceptionRegistry;
     private HandlerExecutor handlerExecutor;
 
     public DispatcherServlet() {
@@ -24,7 +28,11 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     public void init() {
+        final ApplicationContext ac = (ApplicationContext) getServletContext().getAttribute("applicationContext");
+
         this.handlerExecutor = new HandlerExecutor(handlerAdapterRegistry);
+        this.exceptionRegistry = ac.getBean(HandlerExceptionRegistry.class);
+        this.exceptionRegistry.initApplicationContext(ac);
     }
 
     public void addHandlerMapping(final HandlerMapping handlerMapping) {
@@ -39,8 +47,17 @@ public class DispatcherServlet extends HttpServlet {
     protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException {
         log.debug("Method : {}, Request URI : {}", request.getMethod(), request.getRequestURI());
 
+        final var handler = handlerMappingRegistry.getHandler(request);
+
         try {
-            final var handler = handlerMappingRegistry.getHandler(request);
+            doDispatch(request, response, handler);
+        } catch (Throwable e) {
+            processHandlerException(request, response, handler, e);
+        }
+    }
+
+    private void doDispatch(final HttpServletRequest request, final HttpServletResponse response, final Optional<Object> handler) throws Exception {
+        try {
             if (handler.isEmpty()) {
                 response.setStatus(404);
                 return;
@@ -50,7 +67,7 @@ public class DispatcherServlet extends HttpServlet {
             render(modelAndView, request, response);
         } catch (Throwable e) {
             log.error("Exception : {}", e.getMessage(), e);
-            throw new ServletException(e.getMessage());
+            throw e;
         }
     }
 
@@ -58,4 +75,16 @@ public class DispatcherServlet extends HttpServlet {
         final var view = modelAndView.getView();
         view.render(modelAndView.getModel(), request, response);
     }
+
+    private void processHandlerException(final HttpServletRequest req, final HttpServletResponse res, final Object handler, final Throwable ex) {
+        final ModelAndView exMv = this.exceptionRegistry.resolveException(req, res, handler, ex);
+
+        try {
+            render(exMv, req, res);
+        } catch (Exception e) {
+            log.error("Exception in render exMv : {}", e.getMessage(), e);
+            res.setStatus(500);
+        }
+    }
+
 }

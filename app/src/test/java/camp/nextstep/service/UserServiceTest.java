@@ -7,6 +7,7 @@ import camp.nextstep.support.jdbc.init.DatabasePopulatorUtils;
 import com.interface21.context.ApplicationContext;
 import com.interface21.context.support.AnnotationConfigWebApplicationContext;
 import com.interface21.dao.DataAccessException;
+import com.interface21.transaction.TransactionBeanPostProcessor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -43,7 +44,7 @@ class UserServiceTest {
 
     @Test
     void testTransactionRollback() {
-        final ApplicationContext ac = new AnnotationConfigWebApplicationContext(FailConfiguration.class);
+        final ApplicationContext ac = new AnnotationConfigWebApplicationContext(new TransactionBeanPostProcessor(), FailConfiguration.class);
         final UserService userService = ac.getBean(UserService.class);
 
         // 트랜잭션 롤백 테스트를 위해 stub으로 교체

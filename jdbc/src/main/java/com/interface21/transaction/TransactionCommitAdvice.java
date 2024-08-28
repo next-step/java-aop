@@ -1,7 +1,6 @@
-package com.interface21.beans.config;
+package com.interface21.transaction;
 
 import com.interface21.beans.factory.proxy.AfterReturningAdvice;
-import com.interface21.transaction.PlatformTransactionManager;
 
 import java.lang.reflect.Method;
 
