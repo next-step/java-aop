@@ -1,7 +1,7 @@
 package com.interface21.web.exception;
 
 import com.interface21.web.code.ExControllerAdvice;
-import com.interface21.web.code.FakeBeanFactory;
+import com.interface21.web.code.MvcTestBeanFactory;
 import com.interface21.webmvc.servlet.ModelAndView;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ class ExceptionHandlerMethodResolverTest {
     @Test
     public void invokeExceptionResolverMethod() throws Exception {
         // given
-        final FakeBeanFactory beanFactory = new FakeBeanFactory();
+        final MvcTestBeanFactory beanFactory = new MvcTestBeanFactory();
         final ExControllerAdvice advice = new ExControllerAdvice();
         final Method exception = ExControllerAdvice.class.getMethod("exception", Exception.class);
         final ExceptionHandlerMethodResolver methodResolver = new ExceptionHandlerMethodResolver(beanFactory, advice, exception);

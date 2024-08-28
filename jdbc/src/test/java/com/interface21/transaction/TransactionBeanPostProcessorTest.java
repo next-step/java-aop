@@ -4,7 +4,7 @@ import com.interface21.beans.factory.ProxyFactoryBean;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import samples.FakeBeanFactory;
+import samples.JdbcTestBeanFactory;
 import samples.FakeTransactionManager;
 import samples.TxMethodTestService;
 import samples.TxTypeTestService;
@@ -18,7 +18,7 @@ class TransactionBeanPostProcessorTest {
     @Test
     public void transactionCommitInTypeProxy() throws Exception {
         // given
-        final FakeBeanFactory beanFactory = new FakeBeanFactory();
+        final JdbcTestBeanFactory beanFactory = new JdbcTestBeanFactory();
         final FakeTransactionManager transactionManager = (FakeTransactionManager) beanFactory.getBean(PlatformTransactionManager.class);
         final TransactionBeanPostProcessor beanPostProcessor = new TransactionBeanPostProcessor();
         beanPostProcessor.injectBeanFactory(beanFactory);
@@ -39,7 +39,7 @@ class TransactionBeanPostProcessorTest {
     @Test
     public void transactionRollBackInTypeProxy() throws Exception {
         // given
-        final FakeBeanFactory beanFactory = new FakeBeanFactory();
+        final JdbcTestBeanFactory beanFactory = new JdbcTestBeanFactory();
         final FakeTransactionManager transactionManager = (FakeTransactionManager) beanFactory.getBean(PlatformTransactionManager.class);
         final TransactionBeanPostProcessor beanPostProcessor = new TransactionBeanPostProcessor();
         beanPostProcessor.injectBeanFactory(beanFactory);
@@ -58,7 +58,7 @@ class TransactionBeanPostProcessorTest {
     @Test
     public void transactionCommitInTypeMethod() throws Exception {
         // given
-        final FakeBeanFactory beanFactory = new FakeBeanFactory();
+        final JdbcTestBeanFactory beanFactory = new JdbcTestBeanFactory();
         final FakeTransactionManager transactionManager = (FakeTransactionManager) beanFactory.getBean(PlatformTransactionManager.class);
         final TransactionBeanPostProcessor beanPostProcessor = new TransactionBeanPostProcessor();
         beanPostProcessor.injectBeanFactory(beanFactory);
@@ -79,7 +79,7 @@ class TransactionBeanPostProcessorTest {
     @Test
     public void transactionRollBackInTypeMethod() throws Exception {
         // given
-        final FakeBeanFactory beanFactory = new FakeBeanFactory();
+        final JdbcTestBeanFactory beanFactory = new JdbcTestBeanFactory();
         final FakeTransactionManager transactionManager = (FakeTransactionManager) beanFactory.getBean(PlatformTransactionManager.class);
         final TransactionBeanPostProcessor beanPostProcessor = new TransactionBeanPostProcessor();
         beanPostProcessor.injectBeanFactory(beanFactory);
@@ -98,7 +98,7 @@ class TransactionBeanPostProcessorTest {
     @Test
     public void transactionNothingInTypeMethod() throws Exception {
         // given
-        final FakeBeanFactory beanFactory = new FakeBeanFactory();
+        final JdbcTestBeanFactory beanFactory = new JdbcTestBeanFactory();
         final FakeTransactionManager transactionManager = (FakeTransactionManager) beanFactory.getBean(PlatformTransactionManager.class);
         final TransactionBeanPostProcessor beanPostProcessor = new TransactionBeanPostProcessor();
         beanPostProcessor.injectBeanFactory(beanFactory);

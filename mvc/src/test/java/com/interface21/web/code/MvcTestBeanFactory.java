@@ -5,7 +5,7 @@ import com.interface21.beans.config.BeanPostProcessor;
 
 import java.util.Set;
 
-public class FakeBeanFactory implements BeanFactory {
+public class MvcTestBeanFactory implements BeanFactory {
     @Override
     public Set<Class<?>> getBeanClasses() {
         return Set.of();
