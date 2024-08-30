@@ -1,5 +1,6 @@
 package camp.nextstep.hello;
 
+import camp.nextstep.aop.MethodMatcher;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +19,7 @@ public class HelloProxyTest {
                 this.getClass().getClassLoader(),
                 new Class[]{Hello.class},
                 (proxy, method, args) -> {
-                    if (method.getName().startsWith("say")) {
+                    if (matcher.matches(method, target.getClass(), args)) {
                         return ((String) method.invoke(target, args)).toUpperCase();
                     }
                     return method.invoke(target, args);
@@ -30,13 +31,16 @@ public class HelloProxyTest {
         assertThat(proxyInstance.ping("foo")).isEqualTo("Pong foo");
     }
 
+    private final MethodMatcher matcher = (method, targetClass, args) -> method.getName().startsWith("say");
+
     @Test
     @DisplayName("cglib Proxy 적용")
     void cglibProxyTest() {
+        Class<?> targetClass = HelloTarget.class;
         Enhancer enhancer = new Enhancer();
-        enhancer.setSuperclass(HelloTarget.class);
+        enhancer.setSuperclass(targetClass);
         enhancer.setCallback((MethodInterceptor) (obj, method, args, proxy) -> {
-            if (method.getName().startsWith("say")) {
+            if (matcher.matches(method, targetClass, args)) {
                 return ((String) proxy.invokeSuper(obj, args)).toUpperCase();
             }
             return proxy.invokeSuper(obj, args);
