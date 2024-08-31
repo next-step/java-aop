@@ -28,4 +28,8 @@ public class DefaultHandlerExceptionResolver implements HandlerExceptionResolver
         return null;
     }
 
+    @Override
+    public boolean supports(Throwable throwable) {
+        return handlerExecutions.containsKey(throwable.getClass());
+    }
 }

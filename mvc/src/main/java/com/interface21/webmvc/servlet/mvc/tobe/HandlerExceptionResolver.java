@@ -8,4 +8,5 @@ public interface HandlerExceptionResolver {
 
     ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Throwable throwable) throws Exception;
 
+    boolean supports(Throwable throwable);
 }
