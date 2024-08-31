@@ -10,4 +10,9 @@ public class SampleFactoryBean implements FactoryBean<SampleObject> {
     public SampleObject getObject() {
         return new SampleObject("hello");
     }
+
+    @Override
+    public Class<SampleObject> getObjectType() {
+        return SampleObject.class;
+    }
 }

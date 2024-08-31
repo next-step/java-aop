@@ -4,7 +4,9 @@ import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import samples.DatasourceConfiguration;
+import samples.FactoryBeanCreatingConfiguration;
 import samples.SampleObject;
+import samples.World;
 
 import javax.sql.DataSource;
 
@@ -27,5 +29,12 @@ class AnnotationConfigWebApplicationContextTest {
         final SampleObject bean = applicationContext.getBean(SampleObject.class);
         assertThat(bean).isInstanceOf(SampleObject.class);
         assertThat(bean.name()).isEqualTo("hello");
+    }
+
+    @Test
+    void autowiredProxyFactoryBeanTest() {
+        final var applicationContext = new AnnotationConfigWebApplicationContext(FactoryBeanCreatingConfiguration.class);
+        final World world = applicationContext.getBean(World.class);
+        assertThat(world.getMessage()).isEqualTo("Hello, World!");
     }
 }

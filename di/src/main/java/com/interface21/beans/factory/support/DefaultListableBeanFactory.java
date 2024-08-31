@@ -12,7 +12,12 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 public class DefaultListableBeanFactory implements BeanDefinitionRegistry, ConfigurableListableBeanFactory {
 
@@ -44,20 +49,16 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
 
         BeanDefinition beanDefinition = beanDefinitions.get(clazz);
         if (beanDefinition instanceof AnnotatedBeanDefinition) {
-            Optional<Object> optionalBean = createAnnotatedBean(beanDefinition);
-            optionalBean.ifPresent(b -> beans.put(clazz, b));
-            initialize(bean, clazz);
-            return (T) optionalBean.orElse(null);
+            Optional<T> optionalBean = (Optional<T>) createAnnotatedBean(beanDefinition);
+            return (T) optionalBean.map(this::unwrapFactoryBeanAndRegister).orElse(null);
         }
 
         Optional<Class<?>> concreteClazz = BeanFactoryUtils.findConcreteClass(clazz, getBeanClasses());
         if (concreteClazz.isEmpty()) {
             return null;
         }
-        final Object createdBean = createGeneralBean(concreteClazz.get());
-        beans.put(createdBean.getClass(), createdBean);
-        initialize(createdBean, createdBean.getClass());
-        return (T) createdBean;
+        Object createdBean = createGeneralBean(concreteClazz.get());
+        return (T) unwrapFactoryBeanAndRegister(createdBean);
     }
 
     private void initialize(Object bean, Class<?> beanClass) {
@@ -83,16 +84,7 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
     private Object createGeneralBean(Class<?> aClass) {
         BeanDefinition beanDefinition = beanDefinitions.get(aClass);
         log.debug("BeanDefinition : {}", beanDefinition);
-        Object beanInstance = inject(beanDefinition);
-        if (beanInstance instanceof FactoryBean<?> factory) {
-            try {
-                return factory.getObject();
-            } catch (Exception e) {
-                // XXX: 적절한 예외로 변경
-                throw new IllegalStateException(e);
-            }
-        }
-        return beanInstance;
+        return inject(beanDefinition);
     }
 
     private Object[] populateArguments(Class<?>[] paramTypes) {
@@ -140,6 +132,25 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         Constructor<?> constructor = beanDefinition.getInjectConstructor();
         Object[] args = populateArguments(constructor.getParameterTypes());
         return BeanUtils.instantiateClass(constructor, args);
+    }
+
+    private Object unwrapFactoryBeanAndRegister(Object createdBean) {
+        if (createdBean instanceof FactoryBean<?> factoryBean) {
+            try {
+                Object factoryBeanObject = factoryBean.getObject();
+                registerBean(factoryBean.getObjectType(), factoryBeanObject);
+                return factoryBeanObject;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        registerBean(createdBean.getClass(), createdBean);
+        return createdBean;
+    }
+
+    private void registerBean(Class<?> clazz, Object createdBean) {
+        beans.put(clazz, createdBean);
+        initialize(createdBean, clazz);
     }
 
     @Override
