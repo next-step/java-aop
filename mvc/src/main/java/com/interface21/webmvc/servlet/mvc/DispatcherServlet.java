@@ -56,14 +56,18 @@ public class DispatcherServlet extends HttpServlet {
             final var modelAndView = handlerExecutor.handle(request, response, handler.get());
             render(modelAndView, request, response);
         } catch (Throwable e) {
-            log.error("Exception : {}", e.getMessage(), e);
-            ModelAndView modelAndView = handlerExceptionRegistry.handle(request, response, e)
-                                                                .orElseThrow(() -> new ServletException(e.getMessage()));
-            try {
-                render(modelAndView, request, response);
-            } catch (Exception ex) {
-                throw new ServletException(ex);
-            }
+            handlerException(request, response, e);
+        }
+    }
+
+    private void handlerException(HttpServletRequest request, HttpServletResponse response, Throwable e) throws ServletException {
+        log.error("Exception : {}", e.getMessage(), e);
+        ModelAndView modelAndView = handlerExceptionRegistry.handle(request, response, e)
+                                                            .orElseThrow(() -> new ServletException(e.getMessage()));
+        try {
+            render(modelAndView, request, response);
+        } catch (Exception ex) {
+            throw new ServletException(ex);
         }
     }
 
