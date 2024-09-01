@@ -42,3 +42,21 @@ jdbc 미션에서 트랜잭션 동기화를 적용하면서 비즈니스 로직�
 
 * 이 요구사항을 가장 쉽게 구현하려면 JDK Dynamic Proxy의 InvocationHandler와 cglib Proxy의 MethodInterceptor에서 하드코딩하면 된다.
 * 이와 같이 하드코딩하기보다 다음과 같이 Interface를 추가해 추상화해 본다.
+
+# 🚀 2단계 - Proxy와 Bean 의존관계
+
+## 기능 요구사항
+
+## 1. DI 컨테이너의 Bean과 Proxy를 연결
+
+자바 객체가 특정 interface를 구현하는 경우 빈을 생성할 때 예외 처리하도록 DI 컨테이너를 개선한다.
+
+* 예를 들어 위와 같은 인터페이스를 구현하는 Bean이 있다면 FactoryBean 구현체를 DI 컨테이너에 등록하지 않고, getObject() 메소드를 통해 반환되는 Bean을 DI 컨테이너에 등록한다. DI
+  컨테이너의 내부 동작을 보면 다음과 같이 동작할 것이다.
+
+(소스코드 - https://edu.nextstep.camp/s/I3YzY6iR/ls/UJHO4nzf)
+
+## 2. 재사용 가능한 FactoryBean
+
+* Proxy가 추가될 때마다 FactoryBean을 매번 생성하는 것도 귀찮다. 공통적으로 사용할 수 있는 FactoryBean이 있으면 좋겠다.
+* Target, Advice, PointCut을 연결해 Proxy를 생성하는 재사용 가능한 FactoryBean을 추가한다.
