@@ -4,6 +4,7 @@ import com.interface21.beans.factory.support.BeanDefinitionRegistry;
 import com.interface21.beans.factory.support.GenericBeanDefinition;
 import com.interface21.context.stereotype.Component;
 import com.interface21.context.stereotype.Controller;
+import com.interface21.context.stereotype.ControllerAdvice;
 import com.interface21.context.stereotype.Repository;
 import com.interface21.context.stereotype.Service;
 import org.reflections.Reflections;
@@ -24,7 +25,7 @@ public class ClassPathBeanDefinitionScanner {
     public void doScan(Object... basePackages) {
         Reflections reflections = new Reflections(basePackages);
         Set<Class<?>> beanClasses = getTypesAnnotatedWith(reflections, Controller.class, Service.class,
-            Repository.class, Component.class);
+            Repository.class, Component.class, ControllerAdvice.class);
         for (Class<?> clazz : beanClasses) {
             beanDefinitionRegistry.registerBeanDefinition(clazz, new GenericBeanDefinition(clazz));
         }
