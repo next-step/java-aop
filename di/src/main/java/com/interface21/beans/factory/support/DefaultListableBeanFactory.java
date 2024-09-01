@@ -1,5 +1,6 @@
 package com.interface21.beans.factory.support;
 
+import com.interface21.beans.BeanInstantiationException;
 import com.interface21.beans.BeanUtils;
 import com.interface21.beans.factory.ConfigurableListableBeanFactory;
 import com.interface21.beans.factory.FactoryBean;
@@ -141,7 +142,7 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
                 registerBean(factoryBean.getObjectType(), factoryBeanObject);
                 return factoryBeanObject;
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new BeanInstantiationException(createdBean.getClass(), "FactoryBean 객체 처리에 실패", e);
             }
         }
         registerBean(createdBean.getClass(), createdBean);
