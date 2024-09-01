@@ -1,26 +1,30 @@
 package com.interface21.aop;
 
+import com.interface21.aop.advice.AroundAdvice;
 import com.interface21.aop.advisor.Advisor;
+import com.interface21.aop.advisor.Pointcut;
 import org.junit.jupiter.api.Test;
-import samples.HelloAroundAdvice;
-import samples.World;
-import samples.WorldObject;
+import samples.Person;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ProxyFactoryBeanTest {
 
     @Test
-    void proxyFactoryBeanTest() {
-        World target = new WorldObject("new world");
-        ProxyFactoryBean<World> proxyFactoryBean = new ProxyFactoryBean<>();
-        proxyFactoryBean.setTarget(target);
-        proxyFactoryBean.setInterfaces(new Class[]{World.class});
-        proxyFactoryBean.setObjectType(World.class);
-        proxyFactoryBean.addAdvisor(new Advisor(new HelloAroundAdvice()));
+    void usageTest() {
+        final var proxyFactoryBean = new ProxyFactoryBean<Person>();
+        proxyFactoryBean.setTargetClass(Person.class);
+        Pointcut pointcut = (method, targetClass) -> method.getName().contains("getName");
+        AroundAdvice aroundAdvice = methodInvocation -> methodInvocation.proceed().toString().toUpperCase();
+        proxyFactoryBean.addAdvisor(new Advisor(pointcut, aroundAdvice));
+        proxyFactoryBean.setObjectType(Person.class);
+        final var proxy = proxyFactoryBean.getObject();
+        proxy.setName("abc");
+        proxy.setNickname("abcdef");
 
-        World proxy = proxyFactoryBean.getObject();
-        assertThat(target.getMessage()).isEqualTo("new world");
-        assertThat(proxy.getMessage()).isEqualTo("Hello, new world!");
+        assertThat(proxyFactoryBean.getObjectType()).isEqualTo(Person.class);
+
+        assertThat(proxy.getName()).isEqualTo("ABC");
+        assertThat(proxy.getNickname()).isEqualTo("abcdef");
     }
 }

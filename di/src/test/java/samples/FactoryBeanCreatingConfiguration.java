@@ -13,11 +13,8 @@ public class FactoryBeanCreatingConfiguration {
     @SuppressWarnings("unused")
     @Bean
     public ProxyFactoryBean<World> worldProxy() {
-        World target = new WorldObject("World");
-
         ProxyFactoryBean<World> proxyFactoryBean = new ProxyFactoryBean<>();
-        proxyFactoryBean.setInterfaces(new Class[]{World.class});
-        proxyFactoryBean.setTarget(target);
+        proxyFactoryBean.setTargetClass(WorldObject.class);
         proxyFactoryBean.setObjectType(World.class);
         proxyFactoryBean.addAdvisor(new Advisor(new HelloAroundAdvice()));
 
