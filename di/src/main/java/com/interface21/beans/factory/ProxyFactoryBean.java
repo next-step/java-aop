@@ -1,10 +1,10 @@
-package com.interface21.aop;
+package com.interface21.beans.factory;
 
 import com.interface21.aop.advice.AroundAdvice;
 import com.interface21.aop.advice.MethodInvocation;
 import com.interface21.aop.advisor.Advisor;
 import com.interface21.aop.advisor.Pointcut;
-import com.interface21.beans.factory.FactoryBean;
+import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ import java.util.List;
 public class ProxyFactoryBean<T> implements FactoryBean<T> {
 
     private Class<?> targetClass;
-    private Class<T> objectType;
+    private Class<?> objectType;
     private final List<Advisor> advisors = new ArrayList<>();
 
     public void setTargetClass(Class<?> targetClass) {
@@ -24,19 +24,40 @@ public class ProxyFactoryBean<T> implements FactoryBean<T> {
         this.advisors.add(advisor);
     }
 
+    @Override
+    public Class<?> getObjectType() {
+        return objectType;
+    }
+
+    public void setObjectType(Class<?> objectType) {
+        this.objectType = objectType;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public T getObject() {
-        ProxyFactory proxyFactory = new ProxyFactory(
-                targetClass,
-                buildMethodInterceptor()
-        );
-        return (T) proxyFactory.getProxy();
+        final var enhancer = new Enhancer();
+        enhancer.setSuperclass(targetClass);
+        enhancer.setCallback(buildMethodInterceptor());
+        return (T) enhancer.create();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public T getObject(final Class<?>[] argumentTypes, final Object[] arguments) {
+        final var enhancer = new Enhancer();
+        enhancer.setSuperclass(targetClass);
+        enhancer.setCallback(buildMethodInterceptor());
+        return (T) enhancer.create(argumentTypes, arguments);
     }
 
     private MethodInterceptor buildMethodInterceptor() {
         return (obj, method, args, methodProxy) -> {
             MethodInvocation methodInvocation = new MethodInvocation(obj, args, methodProxy);
+
+            if (advisors.isEmpty()) {
+                return methodInvocation.proceed();
+            }
 
             Advisor advisor = advisors.get(0);
             Pointcut pointcut = advisor.getPointcut();
@@ -47,14 +68,5 @@ public class ProxyFactoryBean<T> implements FactoryBean<T> {
                 return methodInvocation.proceed();
             }
         };
-    }
-
-    public void setObjectType(Class<T> objectType) {
-        this.objectType = objectType;
-    }
-
-    @Override
-    public Class<T> getObjectType() {
-        return objectType;
     }
 }

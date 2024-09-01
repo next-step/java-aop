@@ -1,6 +1,6 @@
 package samples;
 
-import com.interface21.aop.ProxyFactoryBean;
+import com.interface21.beans.factory.ProxyFactoryBean;
 import com.interface21.aop.advisor.Advisor;
 import com.interface21.context.annotation.Bean;
 import com.interface21.context.annotation.ComponentScan;

@@ -1,4 +1,4 @@
-package com.interface21.aop;
+package com.interface21.beans.factory;
 
 import com.interface21.aop.advice.AroundAdvice;
 import com.interface21.aop.advisor.Advisor;
