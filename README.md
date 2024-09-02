@@ -66,9 +66,9 @@ cligb를 구현할 때 스샷을 참고해서 아래 VM 옵션을 활성화한�
 
 ## 2단계 요구사항
 
-- [] 1. DI 컨테이너의 Bean과 Proxy 를 연결
+- [x] 1. DI 컨테이너의 Bean과 Proxy 를 연결
   - 기능
-    - [] Factory Bean에서 CGLIB 프록시 객체를 생성한다.
+    - [x] Factory Bean에서 CGLIB 프록시 객체를 생성한다.
 - [x] 2. 재사용 가능한 Factory Bean
   - 기능
     - [x] Target 연결가능
