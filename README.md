@@ -64,6 +64,7 @@ cligb를 구현할 때 스샷을 참고해서 아래 VM 옵션을 활성화한�
 - [x] dynamic proxy 대문자 반환하게 만든다.
 
 
+
 ## 2단계 요구사항
 
 - [x] 1. DI 컨테이너의 Bean과 Proxy 를 연결
@@ -77,6 +78,5 @@ cligb를 구현할 때 스샷을 참고해서 아래 VM 옵션을 활성화한�
       - 비즈니스 로직 전후에 들어갈 로직들을 실행한다. (Interceptor)
     - [x] PointCut 연결가능
       - Matcher로 method 특정한다.
-
 
 
