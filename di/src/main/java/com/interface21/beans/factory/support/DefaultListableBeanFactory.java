@@ -1,7 +1,9 @@
 package com.interface21.beans.factory.support;
 
+import com.interface21.beans.BeanInstantiationException;
 import com.interface21.beans.BeanUtils;
 import com.interface21.beans.factory.ConfigurableListableBeanFactory;
+import com.interface21.beans.factory.FactoryBean;
 import com.interface21.beans.factory.config.BeanDefinition;
 import com.interface21.context.annotation.AnnotatedBeanDefinition;
 import jakarta.annotation.PostConstruct;
@@ -56,7 +58,17 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
 
         beanDefinition = beanDefinitions.get(concreteClazz.get());
         log.debug("BeanDefinition : {}", beanDefinition);
+
         bean = inject(beanDefinition);
+
+        if (bean instanceof FactoryBean) {
+            FactoryBean factory = (FactoryBean) bean;
+            try {
+                bean = factory.getObject();
+            } catch (Exception e) {
+                throw new BeanInstantiationException(bean.getClass(), "Proxy Bean Unwrapping failed");
+            }
+        }
         beans.put(concreteClazz.get(), bean);
         initialize(bean, concreteClazz.get());
         return (T) bean;
