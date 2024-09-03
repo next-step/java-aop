@@ -55,7 +55,7 @@ public class HandlerExceptionConverter {
         return Arrays.stream(exceptionHandler.value())
                 .collect(Collectors.toMap(
                         handlerKey -> handlerKey,
-                        handlerKey -> new ExceptionHandlerExecution(target, method)
+                        handlerKey -> new ExceptionHandlerExecution(argumentResolvers, target, method)
                 ));
     }
 }

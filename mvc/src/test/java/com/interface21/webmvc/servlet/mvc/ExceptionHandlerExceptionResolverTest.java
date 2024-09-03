@@ -1,12 +1,17 @@
 package com.interface21.webmvc.servlet.mvc;
 
+import com.interface21.core.MethodParameter;
+import com.interface21.web.method.support.HandlerMethodArgumentResolver;
 import com.interface21.webmvc.servlet.ModelAndView;
 import com.interface21.webmvc.servlet.view.JspView;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,11 +22,13 @@ class ExceptionHandlerExceptionResolverTest {
 
     @BeforeEach
     void setUp() throws NoSuchMethodException {
+        final List<HandlerMethodArgumentResolver> argumentResolvers = List.of(new FakeArgumentResolver());
+
         final Method runtimeExceptionHandlerMethod = FakeControllerAdvice.class.getMethod("handleRuntimeException", RuntimeException.class);
-        final ExceptionHandlerExecution runtimeExceptionHandlerExecution = new ExceptionHandlerExecution(new FakeControllerAdvice(), runtimeExceptionHandlerMethod);
+        final ExceptionHandlerExecution runtimeExceptionHandlerExecution = new ExceptionHandlerExecution(argumentResolvers,new FakeControllerAdvice(), runtimeExceptionHandlerMethod);
 
         final Method illegalArgumentExceptionHandlerMethod = FakeControllerAdvice.class.getMethod("handleIllegalArgumentException", IllegalArgumentException.class);
-        final ExceptionHandlerExecution illegalArgumentExceptionHandlerExecution = new ExceptionHandlerExecution(new FakeControllerAdvice(), illegalArgumentExceptionHandlerMethod);
+        final ExceptionHandlerExecution illegalArgumentExceptionHandlerExecution = new ExceptionHandlerExecution(argumentResolvers, new FakeControllerAdvice(), illegalArgumentExceptionHandlerMethod);
 
         exceptionResolver = new ExceptionHandlerExceptionResolver(Map.of(
                 RuntimeException.class, runtimeExceptionHandlerExecution,
@@ -76,6 +83,24 @@ class ExceptionHandlerExceptionResolverTest {
 
         public ModelAndView handleIllegalArgumentException(final IllegalArgumentException ex) {
             return new ModelAndView(new JspView("redirect:/index.jsp"));
+        }
+    }
+
+    static class FakeArgumentResolver implements HandlerMethodArgumentResolver {
+
+        @Override
+        public boolean supportsParameter(final MethodParameter parameter) {
+            return parameter.getType().equals(HttpServletRequest.class) || parameter.getType().equals(Throwable.class);
+        }
+
+        @Override
+        public Object resolveArgument(final MethodParameter parameter, final HttpServletRequest request, final HttpServletResponse response) {
+            if (parameter.getType().equals(HttpServletRequest.class)) {
+                return request;
+            } else if (parameter.getType().equals(Throwable.class)) {
+                return new RuntimeException();
+            }
+            return null;
         }
     }
 }

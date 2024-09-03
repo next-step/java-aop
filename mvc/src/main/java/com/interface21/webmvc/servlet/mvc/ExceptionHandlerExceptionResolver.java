@@ -26,7 +26,7 @@ public class ExceptionHandlerExceptionResolver implements HandlerExceptionResolv
         while (exceptionClass != null) {
             final ExceptionHandlerExecution handlerExecution = exceptionHandlers.get(exceptionClass);
             if (handlerExecution != null) {
-                return (ModelAndView) handlerExecution.handle(throwable);
+                return (ModelAndView) handlerExecution.handle(request, response, throwable);
             }
             exceptionClass = exceptionClass.getSuperclass();
         }
