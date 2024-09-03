@@ -15,11 +15,13 @@ public class DispatcherServlet extends HttpServlet {
 
     private final HandlerMappingRegistry handlerMappingRegistry;
     private final HandlerAdapterRegistry handlerAdapterRegistry;
+    private final HandlerExceptionRegistry handlerExceptionRegistry;
     private HandlerExecutor handlerExecutor;
 
     public DispatcherServlet() {
         this.handlerMappingRegistry = new HandlerMappingRegistry();
         this.handlerAdapterRegistry = new HandlerAdapterRegistry();
+        this.handlerExceptionRegistry = new HandlerExceptionRegistry();
     }
 
     @Override
@@ -35,6 +37,10 @@ public class DispatcherServlet extends HttpServlet {
         handlerAdapterRegistry.addHandlerAdapter(handlerAdapter);
     }
 
+    public void addHandlerExceptionResolver(final HandlerExceptionResolver handlerExceptionResolver) {
+        handlerExceptionRegistry.addResolver(handlerExceptionResolver);
+    }
+
     @Override
     protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException {
         log.debug("Method : {}, Request URI : {}", request.getMethod(), request.getRequestURI());
@@ -48,9 +54,18 @@ public class DispatcherServlet extends HttpServlet {
 
             final var modelAndView = handlerExecutor.handle(request, response, handler.get());
             render(modelAndView, request, response);
-        } catch (Throwable e) {
-            log.error("Exception : {}", e.getMessage(), e);
-            throw new ServletException(e.getMessage());
+        } catch (final Throwable e) {
+            handleException(request, response, e);
+        }
+    }
+
+    private void handleException(final HttpServletRequest request, final HttpServletResponse response, final Throwable e) throws ServletException {
+        log.error("Exception : {}", e.getMessage(), e);
+        try {
+            final var modelAndView = handlerExceptionRegistry.resolve(request, response, e);
+            render(modelAndView, request, response);
+        } catch (final Throwable ex) {
+            throw new ServletException(ex.getMessage());
         }
     }
 
