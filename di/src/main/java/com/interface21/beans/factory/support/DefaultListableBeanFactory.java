@@ -36,7 +36,6 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         registerBean(BeanFactory.class, this);
 
         for (Class<?> clazz : getBeanClasses()) {
-            System.out.println("preInstantiateSingletons: " + clazz);
             getBean(clazz);
         }
     }
@@ -62,20 +61,19 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getBean(Class<T> clazz) {
-        Object bean = beans.get(clazz);
-        if (bean != null) {
-            return (T) bean;
+        Object oldBean = beans.get(clazz);
+        if (oldBean != null) {
+            return (T) oldBean;
         }
 
         BeanDefinition beanDefinition = beanDefinitions.get(clazz);
         if (beanDefinition instanceof AnnotatedBeanDefinition) {
-            Object bean1 = createAnnotatedBean(beanDefinition);
-            if (bean1 == null) {
+            Object createdBean = createAnnotatedBean(beanDefinition);
+            if (createdBean == null) {
                 return null;
             }
-            Object bean2 = unwrapFactoryBean(bean1);
-            Object bean3 = postProcess(bean2);
-            return (T) registerBean(getBeanType(bean3), bean3);
+            Object bean = postProcess(unwrapFactoryBean(createdBean));
+            return (T) registerBean(getBeanType(bean), bean);
         }
 
         Optional<Class<?>> concreteClazz = BeanFactoryUtils.findConcreteClass(clazz, getBeanClasses());
@@ -83,10 +81,8 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
             return null;
         }
 
-        Object bean1 = createGeneralBean(concreteClazz.get());
-        Object bean2 = unwrapFactoryBean(bean1);
-        Object bean3 = postProcess(bean2);
-        return (T) registerBean(getBeanType(bean3), bean3);
+        Object createdBean = postProcess(unwrapFactoryBean(createGeneralBean(concreteClazz.get())));
+        return (T) registerBean(getBeanType(createdBean), createdBean);
     }
 
     private void initialize(Object bean, Class<?> beanClass) {
@@ -102,8 +98,7 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
     }
 
     private Object createAnnotatedBean(BeanDefinition beanDefinition) {
-        final var annotatedBeanDefinition = (AnnotatedBeanDefinition) beanDefinition;
-        final var method = annotatedBeanDefinition.getMethod();
+        final var method = ((AnnotatedBeanDefinition) beanDefinition).getMethod();
         final var bean = getBean(method.getDeclaringClass());
         final var args = populateArguments(method.getParameterTypes());
         return BeanFactoryUtils.invokeMethod(method, bean, args).orElse(null);
