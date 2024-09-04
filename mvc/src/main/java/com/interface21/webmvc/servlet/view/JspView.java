@@ -37,4 +37,16 @@ public class JspView implements View {
         final var requestDispatcher = request.getRequestDispatcher(viewName);
         requestDispatcher.forward(request, response);
     }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (!(o instanceof final JspView jspView)) return false;
+        return Objects.equals(viewName, jspView.viewName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(viewName);
+    }
 }

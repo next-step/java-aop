@@ -3,10 +3,12 @@ package camp.nextstep.config;
 import com.interface21.context.support.AnnotationConfigWebApplicationContext;
 import com.interface21.web.WebApplicationInitializer;
 import com.interface21.webmvc.servlet.mvc.DispatcherServlet;
+import com.interface21.webmvc.servlet.mvc.ExceptionHandlerExceptionResolver;
 import com.interface21.webmvc.servlet.mvc.asis.ControllerHandlerAdapter;
 import com.interface21.webmvc.servlet.mvc.asis.ManualHandlerMapping;
 import com.interface21.webmvc.servlet.mvc.tobe.AnnotationHandlerMapping;
 import com.interface21.webmvc.servlet.mvc.tobe.HandlerConverter;
+import com.interface21.webmvc.servlet.mvc.tobe.HandlerExceptionConverter;
 import com.interface21.webmvc.servlet.mvc.tobe.HandlerExecutionHandlerAdapter;
 import jakarta.servlet.ServletContext;
 import org.slf4j.Logger;
@@ -20,15 +22,18 @@ public class MyWebApplicationInitializer implements WebApplicationInitializer {
     public void onStartup(final ServletContext container) {
         final var applicationContext = new AnnotationConfigWebApplicationContext(MyConfiguration.class);
         final var handlerConverter = applicationContext.getBean(HandlerConverter.class);
-        final var annotationHandlerMapping = new AnnotationHandlerMapping(applicationContext, handlerConverter);
+        final var handlerExceptionConverter = applicationContext.getBean(HandlerExceptionConverter.class);
+        final var annotationHandlerMapping = new AnnotationHandlerMapping(applicationContext, handlerConverter, handlerExceptionConverter);
         annotationHandlerMapping.initialize();
 
         final var dispatcherServlet = new DispatcherServlet();
         dispatcherServlet.addHandlerMapping(new ManualHandlerMapping());
-        dispatcherServlet.addHandlerMapping(new AnnotationHandlerMapping(applicationContext, handlerConverter));
+        dispatcherServlet.addHandlerMapping(annotationHandlerMapping);
 
         dispatcherServlet.addHandlerAdapter(new ControllerHandlerAdapter());
         dispatcherServlet.addHandlerAdapter(new HandlerExecutionHandlerAdapter());
+
+        dispatcherServlet.addHandlerExceptionResolver(annotationHandlerMapping.getExceptionHandlerResolver());
 
         final var dispatcher = container.addServlet("dispatcher", dispatcherServlet);
         dispatcher.setLoadOnStartup(1);
