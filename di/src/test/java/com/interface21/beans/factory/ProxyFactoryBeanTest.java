@@ -12,12 +12,15 @@ class ProxyFactoryBeanTest {
 
     @Test
     void usageTest() {
-        final var proxyFactoryBean = new ProxyFactoryBean<Person>();
-        proxyFactoryBean.setTargetClass(Person.class);
         Pointcut pointcut = (method, targetClass) -> method.getName().contains("getName");
         AroundAdvice aroundAdvice = methodInvocation -> methodInvocation.proceed().toString().toUpperCase();
-        proxyFactoryBean.addAdvisor(new Advisor(pointcut, aroundAdvice));
-        proxyFactoryBean.setObjectType(Person.class);
+        Advisor advisor = new Advisor(pointcut, aroundAdvice);
+
+        final var proxyFactoryBean = new ProxyFactoryBean<>(
+                Person.class,
+                Person.class,
+                advisor
+        );
         final var proxy = proxyFactoryBean.getObject();
         proxy.setName("abc");
         proxy.setNickname("abcdef");

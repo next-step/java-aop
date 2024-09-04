@@ -24,7 +24,6 @@ public class UserService {
         return userDao.findByAccount(account);
     }
 
-    // XXX: 여기 @Transactional 달면 에러남
     public User findById(final long id) {
         return userDao.findById(id);
     }

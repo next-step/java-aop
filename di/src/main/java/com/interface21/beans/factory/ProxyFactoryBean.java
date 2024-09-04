@@ -7,21 +7,19 @@ import com.interface21.aop.advisor.Pointcut;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ProxyFactoryBean<T> implements FactoryBean<T> {
 
-    private Class<?> targetClass;
-    private Class<?> objectType;
-    private final List<Advisor> advisors = new ArrayList<>();
+    private final Class<?> targetClass;
+    private final Class<?> objectType;
+    private final List<Advisor> advisors;
 
-    public void setTargetClass(Class<?> targetClass) {
+    public ProxyFactoryBean(Class<?> targetClass, Class<T> objectType, Advisor... advisors) {
         this.targetClass = targetClass;
-    }
-
-    public void addAdvisor(Advisor advisor) {
-        this.advisors.add(advisor);
+        this.objectType = objectType;
+        this.advisors = Arrays.asList(advisors);
     }
 
     @Override
@@ -29,26 +27,23 @@ public class ProxyFactoryBean<T> implements FactoryBean<T> {
         return objectType;
     }
 
-    public void setObjectType(Class<?> objectType) {
-        this.objectType = objectType;
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public T getObject() {
+        return (T) createProxyBuilder().create();
+    }
+
+    private Enhancer createProxyBuilder() {
         final var enhancer = new Enhancer();
         enhancer.setSuperclass(targetClass);
         enhancer.setCallback(buildMethodInterceptor());
-        return (T) enhancer.create();
+        return enhancer;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public T getObject(final Class<?>[] argumentTypes, final Object[] arguments) {
-        final var enhancer = new Enhancer();
-        enhancer.setSuperclass(targetClass);
-        enhancer.setCallback(buildMethodInterceptor());
-        return (T) enhancer.create(argumentTypes, arguments);
+        return (T) createProxyBuilder().create(argumentTypes, arguments);
     }
 
     private MethodInterceptor buildMethodInterceptor() {
