@@ -1,9 +1,11 @@
 package com.interface21.beans.factory.support;
 
+import com.interface21.beans.BeanInstantiationException;
 import com.interface21.beans.BeanUtils;
 import com.interface21.beans.factory.ConfigurableListableBeanFactory;
 import com.interface21.beans.factory.FactoryBean;
 import com.interface21.beans.factory.config.BeanDefinition;
+import com.interface21.beans.factory.config.BeanPostProcessor;
 import com.interface21.context.annotation.AnnotatedBeanDefinition;
 import jakarta.annotation.PostConstruct;
 import java.lang.reflect.Constructor;
@@ -26,6 +28,12 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
     private final Map<Class<?>, Object> beans = new HashMap<>();
 
     private final Map<Class<?>, BeanDefinition> beanDefinitions = new HashMap<>();
+
+    private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
+
+    public void addPostProcessor(final BeanPostProcessor beanPostProcessor) {
+        beanPostProcessors.add(beanPostProcessor);
+    }
 
     @Override
     public void preInstantiateSingletons() {
@@ -50,6 +58,8 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         BeanDefinition beanDefinition = beanDefinitions.get(clazz);
         if (beanDefinition instanceof AnnotatedBeanDefinition annotatedBeanDefinition) {
             bean = getObjectForBeanInstance(createAnnotatedBean(annotatedBeanDefinition));
+            bean = postProcessIfNecessary(bean);
+
             beans.put(bean.getClass(), bean);
             initialize(bean, clazz);
             return (T) bean;
@@ -64,6 +74,7 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         log.debug("BeanDefinition : {}", beanDefinition);
 
         bean = getObjectForBeanInstance(inject(beanDefinition));
+        bean = postProcessIfNecessary(bean);
         beans.put(bean.getClass(), bean);
 
         initialize(bean, concreteClazz.get());
@@ -75,11 +86,20 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
             try {
                 return factoryBean.getObject();
             } catch (Exception e) {
-                throw new RuntimeException("FactoryBean.getObject() 실행 실패", e);
+                throw new BeanInstantiationException(beanInstance.getClass(), "FactoryBean.getObject() 실패");
             }
         }
 
         return beanInstance;
+    }
+
+    private Object postProcessIfNecessary(Object bean) {
+        for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
+            if (beanPostProcessor.requiresProcessing(bean)) {
+                bean = beanPostProcessor.postInitialization(bean);
+            }
+        }
+        return bean;
     }
 
     private void initialize(Object bean, Class<?> beanClass) {

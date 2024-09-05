@@ -17,4 +17,19 @@ public class DatasourceConfiguration {
         jdbcDataSource.setPassword("");
         return jdbcDataSource;
     }
+
+    @Bean
+    public TransactionalOnClass transactionalOnClass() {
+        return new TransactionalOnClass();
+    }
+
+    @Bean
+    public TransactionalOnMethod transactionalOnMethod() {
+        return new TransactionalOnMethod();
+    }
+
+    @Bean
+    public NoneTransactional noneTransactional() {
+        return new NoneTransactional();
+    }
 }
