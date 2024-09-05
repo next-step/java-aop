@@ -1,12 +1,12 @@
 package com.interface21.beans.factory.support;
 
+import com.interface21.beans.BeanInstantiationException;
 import com.interface21.beans.BeanUtils;
 import com.interface21.beans.factory.ConfigurableListableBeanFactory;
 import com.interface21.beans.factory.FactoryBean;
-import com.interface21.beans.factory.TransactionProxyCreator;
 import com.interface21.beans.factory.config.BeanDefinition;
+import com.interface21.beans.factory.config.BeanPostProcessor;
 import com.interface21.context.annotation.AnnotatedBeanDefinition;
-import com.interface21.transaction.annotation.Transactional;
 import jakarta.annotation.PostConstruct;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +28,12 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
     private final Map<Class<?>, Object> beans = new HashMap<>();
 
     private final Map<Class<?>, BeanDefinition> beanDefinitions = new HashMap<>();
+
+    private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
+
+    public void addPostProcessor(final BeanPostProcessor beanPostProcessor) {
+        beanPostProcessors.add(beanPostProcessor);
+    }
 
     @Override
     public void preInstantiateSingletons() {
@@ -81,7 +86,7 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
             try {
                 return factoryBean.getObject();
             } catch (Exception e) {
-                throw new RuntimeException("FactoryBean.getObject() 실행 실패", e);//fixme: 커스터마이징
+                throw new BeanInstantiationException(beanInstance.getClass(), "FactoryBean.getObject() 실패");
             }
         }
 
@@ -89,25 +94,12 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
     }
 
     private Object postProcessIfNecessary(Object bean) {
-        if (hasTransactionalAnnotationAtLeastOne(bean)) {
-            TransactionProxyCreator transactionProxyCreator = new TransactionProxyCreator(getBean(DataSource.class));
-            bean = transactionProxyCreator.postInitialization(bean);
+        for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
+            if (beanPostProcessor.requiresProcessing(bean)) {
+                bean = beanPostProcessor.postInitialization(bean);
+            }
         }
         return bean;
-    }
-
-    private boolean hasTransactionalAnnotationAtLeastOne(final Object bean) {
-        Class<?> beanType = bean.getClass();
-        return hasAnnotationOnClass(beanType) || hasAnnotationOnMethod(beanType);
-    }
-
-    private boolean hasAnnotationOnClass(final Class<?> beanType) {
-        return beanType.getAnnotation(Transactional.class) != null;
-    }
-
-    private boolean hasAnnotationOnMethod(final Class<?> beanType) {
-        return Arrays.stream(beanType.getDeclaredMethods())
-                .anyMatch(method -> method.getAnnotation(Transactional.class) != null);
     }
 
     private void initialize(Object bean, Class<?> beanClass) {

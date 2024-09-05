@@ -1,6 +1,7 @@
 package com.interface21.context.support;
 
 import com.interface21.beans.factory.support.DefaultListableBeanFactory;
+import com.interface21.beans.factory.support.TransactionProxyCreator;
 import com.interface21.context.ApplicationContext;
 import com.interface21.context.annotation.AnnotatedBeanDefinitionReader;
 import com.interface21.context.annotation.ClassPathBeanDefinitionScanner;
@@ -28,6 +29,7 @@ public class AnnotationConfigWebApplicationContext implements ApplicationContext
             final var scanner = new ClassPathBeanDefinitionScanner(beanFactory);
             scanner.doScan(basePackages);
         }
+        beanFactory.addPostProcessor(new TransactionProxyCreator(beanFactory));
         beanFactory.preInstantiateSingletons();
     }
 
