@@ -12,7 +12,12 @@ public class ToolFactory implements FactoryBean<Tool> {
     }
 
     @Override
-    public Class<Tool> getObjectType() {
+    public Tool getObject(Class<?>[] parameterTypes, Object[] objects) {
+        return null;
+    }
+
+    @Override
+    public Class<?> getObjectType() {
         return Tool.class;
     }
 }

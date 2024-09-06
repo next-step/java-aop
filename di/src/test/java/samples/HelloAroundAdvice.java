@@ -1,11 +1,11 @@
 package samples;
 
 import com.interface21.aop.advice.AroundAdvice;
-import com.interface21.aop.advice.JoinPoint;
+import com.interface21.aop.advice.MethodInvocation;
 
 public class HelloAroundAdvice implements AroundAdvice {
     @Override
-    public Object invoke(JoinPoint joinPoint) throws Throwable {
-        return "Hello, " + joinPoint.proceed() + "!";
+    public Object invoke(MethodInvocation methodInvocation) throws Throwable {
+        return "Hello, " + methodInvocation.proceed() + "!";
     }
 }

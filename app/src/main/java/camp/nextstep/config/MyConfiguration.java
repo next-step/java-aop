@@ -4,9 +4,15 @@ import com.interface21.context.annotation.Bean;
 import com.interface21.context.annotation.ComponentScan;
 import com.interface21.context.annotation.Configuration;
 import com.interface21.jdbc.core.JdbcTemplate;
+import com.interface21.transaction.PlatformTransactionManager;
+import com.interface21.transaction.support.DataSourceTransactionManager;
 import com.interface21.web.method.support.HandlerMethodArgumentResolver;
 import com.interface21.webmvc.servlet.mvc.tobe.HandlerConverter;
-import com.interface21.webmvc.servlet.mvc.tobe.support.*;
+import com.interface21.webmvc.servlet.mvc.tobe.support.HttpRequestArgumentResolver;
+import com.interface21.webmvc.servlet.mvc.tobe.support.HttpResponseArgumentResolver;
+import com.interface21.webmvc.servlet.mvc.tobe.support.ModelArgumentResolver;
+import com.interface21.webmvc.servlet.mvc.tobe.support.PathVariableArgumentResolver;
+import com.interface21.webmvc.servlet.mvc.tobe.support.RequestParamArgumentResolver;
 import org.h2.jdbcx.JdbcDataSource;
 
 import javax.sql.DataSource;
@@ -47,5 +53,11 @@ public class MyConfiguration {
             new PathVariableArgumentResolver(),
             new ModelArgumentResolver()
         );
+    }
+
+    @SuppressWarnings("unused")
+    @Bean
+    public PlatformTransactionManager platformTransactionManager(final DataSource dataSource) {
+        return new DataSourceTransactionManager(dataSource);
     }
 }

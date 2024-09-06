@@ -2,6 +2,8 @@ package com.interface21.beans.factory.support;
 
 import com.interface21.beans.BeanInstantiationException;
 import com.interface21.beans.BeanUtils;
+import com.interface21.beans.factory.BeanFactory;
+import com.interface21.beans.factory.BeanPostProcessor;
 import com.interface21.beans.factory.ConfigurableListableBeanFactory;
 import com.interface21.beans.factory.FactoryBean;
 import com.interface21.beans.factory.config.BeanDefinition;
@@ -27,12 +29,28 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
     private final Map<Class<?>, Object> beans = new HashMap<>();
 
     private final Map<Class<?>, BeanDefinition> beanDefinitions = new HashMap<>();
+    private final List<BeanPostProcessor> postProcessors = new ArrayList<>();
 
     @Override
     public void preInstantiateSingletons() {
+        registerBean(BeanFactory.class, this);
+
         for (Class<?> clazz : getBeanClasses()) {
             getBean(clazz);
         }
+    }
+
+    private Object postProcess(Object bean) {
+        var result = bean;
+        for (BeanPostProcessor beanPostProcessor : postProcessors) {
+            result = unwrapFactoryBean(beanPostProcessor.postInitialization(result));
+        }
+        return result;
+    }
+
+    @Override
+    public void addBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
+        postProcessors.add(beanPostProcessor);
     }
 
     @Override
@@ -43,23 +61,28 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getBean(Class<T> clazz) {
-        Object bean = beans.get(clazz);
-        if (bean != null) {
-            return (T) bean;
+        Object oldBean = beans.get(clazz);
+        if (oldBean != null) {
+            return (T) oldBean;
         }
 
         BeanDefinition beanDefinition = beanDefinitions.get(clazz);
         if (beanDefinition instanceof AnnotatedBeanDefinition) {
-            Optional<T> optionalBean = (Optional<T>) createAnnotatedBean(beanDefinition);
-            return (T) optionalBean.map(this::unwrapFactoryBeanAndRegister).orElse(null);
+            Object createdBean = createAnnotatedBean(beanDefinition);
+            if (createdBean == null) {
+                return null;
+            }
+            Object bean = postProcess(unwrapFactoryBean(createdBean));
+            return (T) registerBean(getBeanType(bean), bean);
         }
 
         Optional<Class<?>> concreteClazz = BeanFactoryUtils.findConcreteClass(clazz, getBeanClasses());
         if (concreteClazz.isEmpty()) {
             return null;
         }
-        Object createdBean = createGeneralBean(concreteClazz.get());
-        return (T) unwrapFactoryBeanAndRegister(createdBean);
+
+        Object createdBean = postProcess(unwrapFactoryBean(createGeneralBean(concreteClazz.get())));
+        return (T) registerBean(getBeanType(createdBean), createdBean);
     }
 
     private void initialize(Object bean, Class<?> beanClass) {
@@ -74,12 +97,11 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         }
     }
 
-    private Optional<Object> createAnnotatedBean(BeanDefinition beanDefinition) {
-        final var annotatedBeanDefinition = (AnnotatedBeanDefinition) beanDefinition;
-        final var method = annotatedBeanDefinition.getMethod();
+    private Object createAnnotatedBean(BeanDefinition beanDefinition) {
+        final var method = ((AnnotatedBeanDefinition) beanDefinition).getMethod();
         final var bean = getBean(method.getDeclaringClass());
         final var args = populateArguments(method.getParameterTypes());
-        return BeanFactoryUtils.invokeMethod(method, bean, args);
+        return BeanFactoryUtils.invokeMethod(method, bean, args).orElse(null);
     }
 
     private Object createGeneralBean(Class<?> aClass) {
@@ -135,23 +157,35 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         return BeanUtils.instantiateClass(constructor, args);
     }
 
-    private Object unwrapFactoryBeanAndRegister(Object createdBean) {
+    private Class<?> getBeanType(Object bean) {
+        if (bean instanceof final FactoryBean<?> factoryBean) {
+            return factoryBean.getObjectType();
+        }
+        return bean.getClass();
+    }
+
+    private Object unwrapFactoryBean(Object createdBean) {
         if (createdBean instanceof FactoryBean<?> factoryBean) {
             try {
-                Object factoryBeanObject = factoryBean.getObject();
-                registerBean(factoryBean.getObjectType(), factoryBeanObject);
-                return factoryBeanObject;
+                Constructor<?> injectedConstructor = BeanFactoryUtils.getInjectedConstructor(factoryBean.getObjectType());
+
+                if (injectedConstructor == null) {
+                    return factoryBean.getObject();
+                }
+
+                final Class<?>[] parameterTypes = injectedConstructor.getParameterTypes();
+                return factoryBean.getObject(parameterTypes, populateArguments(parameterTypes));
             } catch (Exception e) {
                 throw new BeanInstantiationException(createdBean.getClass(), "FactoryBean 객체 처리에 실패", e);
             }
         }
-        registerBean(createdBean.getClass(), createdBean);
         return createdBean;
     }
 
-    private void registerBean(Class<?> clazz, Object createdBean) {
+    private Object registerBean(Class<?> clazz, Object createdBean) {
         beans.put(clazz, createdBean);
         initialize(createdBean, clazz);
+        return createdBean;
     }
 
     @Override
