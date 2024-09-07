@@ -60,3 +60,26 @@ jdbc 미션에서 트랜잭션 동기화를 적용하면서 비즈니스 로직�
 
 * Proxy가 추가될 때마다 FactoryBean을 매번 생성하는 것도 귀찮다. 공통적으로 사용할 수 있는 FactoryBean이 있으면 좋겠다.
 * Target, Advice, PointCut을 연결해 Proxy를 생성하는 재사용 가능한 FactoryBean을 추가한다.
+
+# 🚀 4단계 - ControllerAdvice, ExceptionHandler 구현하기
+
+## 기능 요구사항
+
+* Controller, ArgumentResolver와 같은 곳에서 Exception이 발생할 경우 Exception을 처리할 수 있어야 한다.
+* 현재 구현된 버전의 코드는 Exception이 발생해도 적절한 처리를 하고 있지 않다. 로그인 실패는 401 페이지로 리다이렉트 하도록 만든 상태다. @ControllerAdvice 기능을 추가하여 예외 처리를
+  한 곳에서 관리할 수 있도록 만들자.
+
+```java
+
+@ControllerAdvice
+public class MyAdvice {
+    @ExceptionHandler(DataAccessException.class)
+    public ModelAndView dataAccessException() {
+        return jspView("redirect:/index.jsp")
+    }
+}
+```
+
+### 힌트
+
+* ControllerAdvice의 메소드도 HandlerExecution의 하나로 생각할 수 있다. 단, Mapping이 요청 URL 기반이 아니라 Exception 기반이로 매핑한다는 것이 다를 뿐이다.
