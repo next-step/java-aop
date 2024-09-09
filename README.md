@@ -78,5 +78,24 @@ cligb를 구현할 때 스샷을 참고해서 아래 VM 옵션을 활성화한�
       - 비즈니스 로직 전후에 들어갈 로직들을 실행한다. (Interceptor)
     - [x] PointCut 연결가능
       - Matcher로 method 특정한다.
+피드백
+
+- [x] Target, Advisor, Advice, PointCut, JoinPoint 에 대한 키워드 설명
+  AOP 란 OOP로 코드 중복을 극복할 수 없는 상황에서, 코드 단위를 주입하기 위해 사용합니다.
+
+스프링에서는 보안, 로깅, 캐싱의 기능들을 프록시 패턴을 이용해 구현하게 됩니다.
+Target 이란, 보안, 로깅, 캐싱 과 같은 부가기능들을 적용할 대상으로, ElementType으로 지정되어 메서드, 패키지, 파라미터, 필드, 생성자들이 대상이 될 수 있습니다.
+Advisor 이란, PointCut(부가기능 적용 위치)과 Advice(부가기능)를 가지고 Proxy 기능을 실행하기 위한 재료를 가지는 책임을 가집니다. [Advisor 인터페이스]
+Advice 이란, 부가기능으로, Pointcut으로 선정된 JoinPoint에 실행될 코드입니다. [Interceptor 인터페이스]
+  - @Before, @AfterReturning, @AfterThrowing, @After 와 같은 언제라는 개념도 여기 적용 됩니다.
+PointCut 이란, Advice를 적용할 조건들을 나열합니다. [PointCut 인터페이스]
+Joinpoint 이란, Advice를 적용할 위치로, PointCut 조건들에 의해 추려진 곳을 이야기합니다. [Invocation 인터페이스] 
+  - 메서드 호출시, 변수에 접근할 때, 객체를 초기화 할때, 객체에 접근할때 라는 언제 개념도 여기 적용됩니다.
+
+- [] Target, Advisor, Advice, PointCut, JoinPoint 에 대한 객체 구현
+- [] Target, Advisor, Advice, PointCut, JoinPoint 에 대한 단위 테스트 구현
+- [] Target 은 ElementType을 설정할 수 있음
+- [] FactoryBean을 Bean으로 등록하는 과정 대신에, @Transactional 어노테이션을 붙여서 자동화 하는 방법은 무엇일까요?
+
 
 
