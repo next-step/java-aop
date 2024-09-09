@@ -15,6 +15,7 @@ repositories {
 }
 
 dependencies {
+    implementation project(":aop")
     implementation project(":di")
 
     implementation 'jakarta.servlet:jakarta.servlet-api:5.0.0'

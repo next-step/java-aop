@@ -24,6 +24,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         this.handlerConverter = handlerConverter;
     }
 
+    @Override
     public void initialize() {
         Map<Class<?>, Object> controllers = getControllers(applicationContext);
         handlerExecutions.putAll(handlerConverter.convert(controllers));
@@ -41,6 +42,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         return controllers;
     }
 
+    @Override
     public HandlerExecution getHandler(final HttpServletRequest request) {
         final var requestUri = request.getRequestURI();
         final var requestMethod = RequestMethod.valueOf(request.getMethod().toUpperCase());
