@@ -1,4 +1,4 @@
 package com.interface21.beans.factory.proxy.advice;
 
-public interface AfterReturningAdvice extends Advice{
+public interface AfterReturningAdvice extends Advice {
 }

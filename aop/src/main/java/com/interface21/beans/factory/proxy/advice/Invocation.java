@@ -4,5 +4,6 @@ import java.lang.reflect.Method;
 
 public interface Invocation {
     Method getMethod();
+
     Object proceed() throws Throwable;
 }
