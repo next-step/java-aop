@@ -1,4 +1,4 @@
-package com.interface21.beans.factory;
+package com.interface21.beans.factory.proxy.factory;
 
 public interface FactoryBean<T> {
 

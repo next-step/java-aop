@@ -1,4 +1,4 @@
-package com.interface21.beans.factory;
+package com.interface21.beans.factory.proxy.factory;
 
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;

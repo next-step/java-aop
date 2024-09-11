@@ -3,6 +3,8 @@ package com.interface21.beans.factory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.Method;
+
+import com.interface21.beans.factory.proxy.factory.ProxyFactoryBean;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
