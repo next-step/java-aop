@@ -92,9 +92,8 @@ PointCut 이란, Advice를 적용할 조건들을 나열합니다. [PointCut 인
 Joinpoint 이란, Advice를 적용할 위치로, PointCut 조건들에 의해 추려진 곳을 이야기합니다. [Invocation 인터페이스] 
   - 메서드 호출시, 변수에 접근할 때, 객체를 초기화 할때, 객체에 접근할때 라는 언제 개념도 여기 적용됩니다.
 
-- [] Target, Advisor, Advice, PointCut, JoinPoint 에 대한 객체 구현
-- [] Target, Advisor, Advice, PointCut, JoinPoint 에 대한 단위 테스트 구현
-- [] Target 은 ElementType을 설정할 수 있음
+- [x] Target, Advisor, Advice, PointCut, JoinPoint 에 대한 객체 구현
+- [x] Target, Advisor, Advice, PointCut, JoinPoint 에 대한 단위 테스트 구현
 - [] FactoryBean을 Bean으로 등록하는 과정 대신에, @Transactional 어노테이션을 붙여서 자동화 하는 방법은 무엇일까요?
 
 
