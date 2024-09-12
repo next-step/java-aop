@@ -20,4 +20,6 @@ public class CglibAopProxy implements AopProxy {
         enhancer.setCallback(new DynamicAdvisedInterceptor(this.advised));
         return enhancer.create();
     }
+
+
 }

@@ -1,21 +1,20 @@
 package com.interface21.beans.factory;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.interface21.beans.factory.config.AdvisedSupport;
 import com.interface21.beans.factory.proxy.Advisor;
 import com.interface21.beans.factory.proxy.DefaultAdvisor;
-import com.interface21.beans.factory.proxy.advice.AfterReturningAdvice;
-import com.interface21.beans.factory.proxy.advice.BeforeAdvice;
+import com.interface21.beans.factory.proxy.advice.Interceptor;
 import com.interface21.beans.factory.proxy.factory.ProxyFactoryBean;
+import com.interface21.beans.factory.proxy.joinpoint.MethodInvocation;
 import com.interface21.beans.factory.proxy.pointcut.Pointcut;
 import com.interface21.beans.factory.proxy.pointcut.TrueMethodMatcher;
-import java.lang.reflect.Method;
 import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.MethodInterceptor;
-import net.sf.cglib.proxy.MethodProxy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.logging.Logger;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ProxyFactoryBeanTest {
 
@@ -23,7 +22,7 @@ class ProxyFactoryBeanTest {
     @DisplayName("Cglib 프록시 객체 생성")
     void createProxyObject() {
         Pointcut pointCut = new TrueMethodMatcher();
-        MethodInterceptor methodInterceptor = new LogInterceptor();
+        Interceptor methodInterceptor = new LogInterceptor();
 
         Advisor advisor = new DefaultAdvisor(pointCut, methodInterceptor);
 
@@ -37,27 +36,19 @@ class ProxyFactoryBeanTest {
         Sample sample = proxyFactoryBean.getObject();
 
         assertThat(sample).isInstanceOf(Sample.class);
-        assertThat(sample.hi()).isEqualTo("HI");
         assertThat(Enhancer.isEnhanced(sample.getClass())).isTrue();
+        assertThat(sample.hi()).isEqualTo("HI");
     }
 
 
-    public class LogInterceptor implements AfterReturningAdvice {
+    public class LogInterceptor implements Interceptor {
+        private static final Logger LOGGER = Logger.getLogger(LogInterceptor.class.getName());
 
         @Override
-        public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy)
-            throws Throwable {
-            Object returnValue = proxy.invokeSuper(obj, args);
+        public Object invoke(MethodInvocation invocation) throws Throwable {
+            Object returned = invocation.proceed();
 
-            return returnValue.toString().toUpperCase();
-        }
-
-
-
-        @Override
-        public void afterReturning(Object returned, Method method, Object[] args, Object target) {
-            System.out.println("hell");
-
+            return returned.toString().toUpperCase();
         }
     }
 }
