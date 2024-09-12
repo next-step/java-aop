@@ -8,10 +8,11 @@ import java.util.List;
 
 public class AdvisedSupport implements Advised {
 
-    private final List<Advisor> advisors = new ArrayList<>();
+    private final List<Advisor> advisors;
     private Class<?> targetClass;
 
     public AdvisedSupport() {
+        advisors = new ArrayList<>();
     }
 
     @Override

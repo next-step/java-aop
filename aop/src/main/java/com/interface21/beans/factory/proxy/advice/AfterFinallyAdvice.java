@@ -4,7 +4,7 @@ import net.sf.cglib.proxy.MethodInterceptor;
 
 import java.lang.reflect.Method;
 
-public interface AfterFinallyAdvice extends MethodInterceptor {
+public interface AfterFinallyAdvice extends Interceptor {
     void afterFinally(Method method, Object[] args, Object target) throws Throwable;
 
 }
