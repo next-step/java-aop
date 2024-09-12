@@ -2,6 +2,7 @@ package com.interface21.beans.factory.config;
 
 import com.interface21.beans.factory.Advised;
 import com.interface21.beans.factory.proxy.Advisor;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,12 +25,12 @@ public class AdvisedSupport implements Advised {
     }
 
     @Override
-    public List<Advisor> getAdvisors() {
-        return this.advisors;
+    public void setTarget(Class<?> target) {
+        this.targetClass = target;
     }
 
     @Override
-    public void setTarget(Class<?> target) {
-        this.targetClass = target;
+    public List<Advisor> getAdvisors() {
+        return this.advisors;
     }
 }
