@@ -19,6 +19,8 @@ public class DynamicAdvisedInterceptor implements MethodInterceptor {
         for (Advisor advisor : advised.getAdvisors()) {
             if (advisor.getAdvice() instanceof BeforeAdvice) {
                 ((BeforeAdvice) advisor.getAdvice()).before(method, args, advised.getTarget());
+                advisor.getAdvice().intercept(obj, method, args, proxy);
+
             }
         }
 
@@ -27,6 +29,7 @@ public class DynamicAdvisedInterceptor implements MethodInterceptor {
         for (Advisor advisor : advised.getAdvisors()) {
             if (advisor.getAdvice() instanceof AfterReturningAdvice) {
                 ((AfterReturningAdvice) advisor.getAdvice()).afterReturning(returnValue, method, args, advised.getTarget());
+                advisor.getAdvice().intercept(obj, method, args, proxy);
             }
         }
 

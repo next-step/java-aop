@@ -1,5 +1,7 @@
 package com.interface21.beans.factory.proxy.advice;
 
-public interface Interceptor extends Advice {
+import net.sf.cglib.proxy.MethodInterceptor;
+
+public interface Interceptor extends MethodInterceptor {
 
 }

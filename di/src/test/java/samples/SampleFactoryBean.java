@@ -1,6 +1,6 @@
 package samples;
 
-import com.interface21.beans.factory.proxy.factory.FactoryBean;
+import com.interface21.beans.factory.proxy.FactoryBean;
 import com.interface21.context.stereotype.Component;
 
 @Component

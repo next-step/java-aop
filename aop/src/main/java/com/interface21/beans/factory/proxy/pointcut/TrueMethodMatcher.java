@@ -13,4 +13,5 @@ public class TrueMethodMatcher implements MethodMatcher {
     public boolean isRuntime() {
         return false;
     }
+
 }

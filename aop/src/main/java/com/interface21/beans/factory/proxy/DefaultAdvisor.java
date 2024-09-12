@@ -1,20 +1,20 @@
 package com.interface21.beans.factory.proxy;
 
-import com.interface21.beans.factory.proxy.advice.Advice;
 import com.interface21.beans.factory.proxy.pointcut.Pointcut;
+import net.sf.cglib.proxy.MethodInterceptor;
 
 public class DefaultAdvisor implements Advisor {
 
     private final Pointcut pointcut;
-    private final Advice advice;
+    private final MethodInterceptor advice;
 
-    public DefaultAdvisor(Pointcut pointcut, Advice advice) {
+    public DefaultAdvisor(Pointcut pointcut, MethodInterceptor advice) {
         this.pointcut = pointcut;
         this.advice = advice;
     }
 
     @Override
-    public Advice getAdvice() {
+    public MethodInterceptor getAdvice() {
         return this.advice;
     }
 

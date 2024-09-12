@@ -19,4 +19,5 @@ public class DefaultMethodMatcher implements MethodMatcher {
     public boolean isRuntime() {
         return false;
     }
+
 }

@@ -3,7 +3,7 @@ package com.interface21.beans.factory.support;
 import com.interface21.beans.BeanInstantiationException;
 import com.interface21.beans.BeanUtils;
 import com.interface21.beans.factory.ConfigurableListableBeanFactory;
-import com.interface21.beans.factory.proxy.factory.FactoryBean;
+import com.interface21.beans.factory.proxy.FactoryBean;
 import com.interface21.beans.factory.config.BeanDefinition;
 import com.interface21.context.annotation.AnnotatedBeanDefinition;
 import jakarta.annotation.PostConstruct;
