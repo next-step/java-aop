@@ -97,4 +97,12 @@ Joinpoint 이란, Advice를 적용할 위치로, PointCut 조건들에 의해 �
 - [] FactoryBean을 Bean으로 등록하는 과정 대신에, @Transactional 어노테이션을 붙여서 자동화 하는 방법은 무엇일까요?
 
 
+## 3단계 요구사항 
+
+- [] 트랜잭션 처리를 하고싶은 메서드에 @Transactional을 추가하면 트랜잭션 처리가 된다.
+- [] UserService인터페이스 삭제, AppUserService 클래스를 UserService로 일므 변경
+- [] TxUserService 클래스의 트랜잭션 처리 로직을 cglib 프록시로 옮기고, TxUserService를 삭제
+- [] FactoryBean으로 프록시를 생성한다. (메서드 레벨, 클래스 레벨 애노테이션을 설정한다.)
+- [] 모듈간 서로 의존하는 구조가 되므로, 트랜잭션 처리로직은 tx 모듈로 분리한다.
+
 
