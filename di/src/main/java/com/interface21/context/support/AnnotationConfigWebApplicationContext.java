@@ -5,6 +5,7 @@ import com.interface21.context.ApplicationContext;
 import com.interface21.context.annotation.AnnotatedBeanDefinitionReader;
 import com.interface21.context.annotation.ClassPathBeanDefinitionScanner;
 import com.interface21.context.annotation.ComponentScan;
+import com.interface21.transaction.bean.BeanPostProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +31,8 @@ public class AnnotationConfigWebApplicationContext implements ApplicationContext
             scanner.doScan(basePackages);
         }
         beanFactory.preInstantiateSingletons();
+
+        registerBeanPostProcessors(beanFactory);
     }
 
     private Object[] findBasePackages(Class<?>[] annotatedClasses) {
@@ -55,5 +58,11 @@ public class AnnotationConfigWebApplicationContext implements ApplicationContext
     @Override
     public Set<Class<?>> getBeanClasses() {
         return beanFactory.getBeanClasses();
+    }
+
+
+    protected void registerBeanPostProcessors(DefaultListableBeanFactory beanFactory) {
+        BeanPostProcessor postProcessor = beanFactory.getBean(BeanPostProcessor.class);
+        beanFactory.addBeanPostProcessor(postProcessor);
     }
 }

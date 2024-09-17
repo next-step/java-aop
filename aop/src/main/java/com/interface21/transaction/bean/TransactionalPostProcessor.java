@@ -1,9 +1,10 @@
-package com.interface21.transaction;
+package com.interface21.transaction.bean;
 
 import com.interface21.beans.factory.Advised;
 import com.interface21.beans.factory.config.AdvisedSupport;
-import com.interface21.beans.factory.config.BeanPostProcessor;
 import com.interface21.beans.factory.proxy.factory.ProxyFactoryBean;
+import com.interface21.transaction.PlatformTransactionManager;
+import com.interface21.transaction.TransactionalAdvisor;
 
 public class TransactionalPostProcessor implements BeanPostProcessor {
 
