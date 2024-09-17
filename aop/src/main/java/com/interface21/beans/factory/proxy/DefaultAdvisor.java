@@ -24,6 +24,7 @@ public class DefaultAdvisor implements Advisor {
         return advice.invoke(methodInvocation);
     }
 
+    @Override
     public Pointcut getPointcut() {
         return pointcut;
     }
