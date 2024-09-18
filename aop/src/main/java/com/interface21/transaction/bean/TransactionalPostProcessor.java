@@ -28,7 +28,7 @@ public class TransactionalPostProcessor implements BeanPostProcessor {
 
         TransactionalMatcher matcher = (TransactionalMatcher) advisor.getPointcut();
 
-        boolean transactional = Arrays.stream(clazz.getMethods())
+        boolean transactional = Arrays.stream(clazz.getDeclaredMethods())
             .filter(method -> matcher.matches(method))
             .findAny()
             .isPresent();
