@@ -2,9 +2,13 @@ package com.interface21.transaction.bean;
 
 import com.interface21.beans.factory.Advised;
 import com.interface21.beans.factory.config.AdvisedSupport;
+import com.interface21.beans.factory.proxy.Advisor;
 import com.interface21.beans.factory.proxy.factory.ProxyFactoryBean;
 import com.interface21.transaction.PlatformTransactionManager;
 import com.interface21.transaction.TransactionalAdvisor;
+import com.interface21.transaction.TransactionalMatcher;
+import java.util.Arrays;
+
 
 public class TransactionalPostProcessor implements BeanPostProcessor {
 
@@ -18,10 +22,21 @@ public class TransactionalPostProcessor implements BeanPostProcessor {
     public Object postInitialization(Object bean) {
         Class<?> clazz = bean.getClass();
         Advised advisedSupport = new AdvisedSupport();
-        advisedSupport.addAdvisor(new TransactionalAdvisor(platformTransactionManager));
+        Advisor advisor = new TransactionalAdvisor(platformTransactionManager);
+        advisedSupport.addAdvisor(advisor);
         advisedSupport.setTarget(clazz);
 
-       return new ProxyFactoryBean<>(clazz,
-            advisedSupport);
+        TransactionalMatcher matcher = (TransactionalMatcher) advisor.getPointcut();
+
+        boolean transactional = Arrays.stream(clazz.getMethods())
+            .filter(method -> matcher.matches(method))
+            .findAny()
+            .isPresent();
+
+        if (transactional) {
+            return new ProxyFactoryBean<>(clazz,
+                advisedSupport);
+        }
+        return bean;
     }
 }

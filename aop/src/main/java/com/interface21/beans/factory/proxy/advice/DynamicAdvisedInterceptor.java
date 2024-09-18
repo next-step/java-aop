@@ -28,7 +28,6 @@ public class DynamicAdvisedInterceptor implements MethodInterceptor {
         for (Advisor advisor : advised.getAdvisors()) {
             if (advisor.getAdvice() instanceof BeforeAdvice) {
                 ((BeforeAdvice) advisor.getAdvice()).before(method, args, advised.getTarget());
-
             }
         }
 

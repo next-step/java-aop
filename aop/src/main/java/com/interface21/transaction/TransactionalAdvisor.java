@@ -8,7 +8,7 @@ import com.interface21.beans.factory.proxy.pointcut.Pointcut;
 public class TransactionalAdvisor implements Advisor {
 
     private final Interceptor transactionalAdvice;
-    private final Pointcut pointcut;
+    private final TransactionalMatcher pointcut;
 
     public TransactionalAdvisor(PlatformTransactionManager platformTransactionManager) {
         this.transactionalAdvice = new TransactionalAdvice(platformTransactionManager);

@@ -7,7 +7,6 @@ import com.interface21.context.annotation.ComponentScan;
 import com.interface21.context.annotation.Configuration;
 import com.interface21.jdbc.core.JdbcTemplate;
 import com.interface21.transaction.PlatformTransactionManager;
-import com.interface21.transaction.bean.BeanPostProcessor;
 import com.interface21.transaction.bean.TransactionalPostProcessor;
 import com.interface21.transaction.support.DataSourceTransactionManager;
 import com.interface21.web.method.support.HandlerMethodArgumentResolver;
@@ -52,8 +51,10 @@ public class MyConfiguration {
     }
 
     @Bean
-    public BeanPostProcessor beanPostProcessorScanner(PlatformTransactionManager platformTransactionManager) {
-        BeanPostProcessor beanPostProcessorScanner = new TransactionalPostProcessor(platformTransactionManager);
+    public TransactionalPostProcessor beanPostProcessorScanner(
+        PlatformTransactionManager platformTransactionManager) {
+        TransactionalPostProcessor beanPostProcessorScanner = new TransactionalPostProcessor(
+            platformTransactionManager);
 
         return beanPostProcessorScanner;
     }
