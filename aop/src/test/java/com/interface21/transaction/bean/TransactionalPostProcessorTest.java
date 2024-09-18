@@ -34,4 +34,14 @@ class TransactionalPostProcessorTest {
         assertThat(wrapped).isInstanceOf(ProxyFactoryBean.class);
     }
 
+    @Test
+    @DisplayName("PostProcessor가 클래스 트랜잭션을 가지고있지 않은 Bean을 Proxy bean으로 생성한 bean을 생성하지 않습니다.")
+    void intializeNonTransactionClass() {
+        transactionalPostProcessor = new TransactionalPostProcessor(
+                mock(PlatformTransactionManager.class));
+        NonTransactionClass sample = new NonTransactionClass();
+        Object wrapped = transactionalPostProcessor.postInitialization(sample);
+
+        assertThat(wrapped).isNotInstanceOf(ProxyFactoryBean.class);
+    }
 }
