@@ -36,4 +36,5 @@ public class MyWebApplicationInitializer implements WebApplicationInitializer {
 
         log.info("Start AppWebApplication Initializer");
     }
+
 }

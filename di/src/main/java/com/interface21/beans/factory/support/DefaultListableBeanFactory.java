@@ -6,6 +6,7 @@ import com.interface21.beans.factory.ConfigurableListableBeanFactory;
 import com.interface21.beans.factory.proxy.FactoryBean;
 import com.interface21.beans.factory.config.BeanDefinition;
 import com.interface21.context.annotation.AnnotatedBeanDefinition;
+import com.interface21.transaction.bean.BeanPostProcessor;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,12 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
     private final Map<Class<?>, Object> beans = new HashMap<>();
 
     private final Map<Class<?>, BeanDefinition> beanDefinitions = new HashMap<>();
+
+    private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
+
+    public void addBeanPostProcessor(BeanPostProcessor postProcessor) {
+        this.beanPostProcessors.add(postProcessor);
+    }
 
     @Override
     public void preInstantiateSingletons() {
@@ -70,20 +77,26 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
             }
         }
         beans.put(concreteClazz.get(), bean);
-        initialize(bean, concreteClazz.get());
-        return (T) bean;
+        Object wrappedBean = initialize(bean, concreteClazz.get());
+        return (T) wrappedBean;
     }
 
-    private void initialize(Object bean, Class<?> beanClass) {
+    private Object initialize(Object bean, Class<?> beanClass) {
+        Object wrappedBean = bean;
+
         Set<Method> initializeMethods = BeanFactoryUtils.getBeanMethods(beanClass, PostConstruct.class);
-        if (initializeMethods.isEmpty()) {
-            return;
-        }
+
         for (Method initializeMethod : initializeMethods) {
             log.debug("@PostConstruct Initialize Method : {}", initializeMethod);
             BeanFactoryUtils.invokeMethod(initializeMethod, bean,
                 populateArguments(initializeMethod.getParameterTypes()));
         }
+
+        for (BeanPostProcessor postProcessor : this.beanPostProcessors) {
+            wrappedBean = postProcessor.postInitialization(wrappedBean);
+        }
+
+        return wrappedBean;
     }
 
     private Optional<Object> createAnnotatedBean(BeanDefinition beanDefinition) {

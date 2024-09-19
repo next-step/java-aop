@@ -39,7 +39,7 @@ class UserServiceTest {
     @Test
     void testChangePassword() {
         final var userHistoryDao = new UserHistoryDao(jdbcTemplate);
-        final var userService = new AppUserService(userDao, userHistoryDao);
+        final var userService = new UserService(userDao, userHistoryDao);
 
         final var newPassword = "qqqqq";
         final var createBy = "gugu";
@@ -55,10 +55,9 @@ class UserServiceTest {
         // 트랜잭션 롤백 테스트를 위해 stub으로 교체
         final var userHistoryDao = new StubUserHistoryDao(jdbcTemplate);
         // 애플리케이션 서비스
-        final var appUserService = new AppUserService(userDao, userHistoryDao);
         // 트랜잭션 서비스 추상화
         final var transactionManager = new DataSourceTransactionManager(dataSource);
-        final var userService = new TxUserService(transactionManager, appUserService);
+        final var userService = new UserService(userDao, userHistoryDao);
 
         final var newPassword = "newPassword";
         final var createBy = "gugu";

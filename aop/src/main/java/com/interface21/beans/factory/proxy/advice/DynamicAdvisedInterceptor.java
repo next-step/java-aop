@@ -20,13 +20,14 @@ public class DynamicAdvisedInterceptor implements MethodInterceptor {
     @Override
     public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
 
-        List<Interceptor> interceptors = advised.getAdvisors().stream().map(advisor -> advisor.getAdvice()).toList();
+        List<Interceptor> interceptors = advised.getAdvisors().stream()
+            .map(Advisor::getAdvice)
+            .toList();
         MethodInvocation invocation = new DefaultJoinPoint(proxy, method, args, obj, interceptors);
 
         for (Advisor advisor : advised.getAdvisors()) {
             if (advisor.getAdvice() instanceof BeforeAdvice) {
                 ((BeforeAdvice) advisor.getAdvice()).before(method, args, advised.getTarget());
-
             }
         }
 

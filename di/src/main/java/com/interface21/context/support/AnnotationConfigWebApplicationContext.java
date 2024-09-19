@@ -5,13 +5,14 @@ import com.interface21.context.ApplicationContext;
 import com.interface21.context.annotation.AnnotatedBeanDefinitionReader;
 import com.interface21.context.annotation.ClassPathBeanDefinitionScanner;
 import com.interface21.context.annotation.ComponentScan;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.interface21.transaction.bean.BeanPostProcessor;
+import com.interface21.transaction.bean.TransactionalPostProcessor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AnnotationConfigWebApplicationContext implements ApplicationContext {
 
@@ -29,7 +30,9 @@ public class AnnotationConfigWebApplicationContext implements ApplicationContext
             final var scanner = new ClassPathBeanDefinitionScanner(beanFactory);
             scanner.doScan(basePackages);
         }
+        registerBeanPostProcessors(beanFactory);
         beanFactory.preInstantiateSingletons();
+
     }
 
     private Object[] findBasePackages(Class<?>[] annotatedClasses) {
@@ -55,5 +58,11 @@ public class AnnotationConfigWebApplicationContext implements ApplicationContext
     @Override
     public Set<Class<?>> getBeanClasses() {
         return beanFactory.getBeanClasses();
+    }
+
+
+    protected void registerBeanPostProcessors(DefaultListableBeanFactory beanFactory) {
+        BeanPostProcessor postProcessor = beanFactory.getBean(TransactionalPostProcessor.class);
+        beanFactory.addBeanPostProcessor(postProcessor);
     }
 }

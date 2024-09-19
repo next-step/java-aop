@@ -1,4 +1,4 @@
-package com.interface21.beans.factory.config;
+package com.interface21.transaction.bean;
 
 public interface BeanPostProcessor {
 

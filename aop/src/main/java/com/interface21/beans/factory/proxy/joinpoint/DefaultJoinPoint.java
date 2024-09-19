@@ -36,8 +36,8 @@ public class DefaultJoinPoint implements MethodInvocation {
 
         Interceptor interceptorOrInterceptionAdvice = this.invocations.get(++this.currentInterceptorIndex);
         if (interceptorOrInterceptionAdvice instanceof Interceptor) {
-            Interceptor mi = interceptorOrInterceptionAdvice;
-            return mi.invoke(this);
+            Interceptor methodInterceptor = interceptorOrInterceptionAdvice;
+            return methodInterceptor.invoke(this);
         } else {
             return proceed();
         }

@@ -94,7 +94,30 @@ Joinpoint 이란, Advice를 적용할 위치로, PointCut 조건들에 의해 �
 
 - [x] Target, Advisor, Advice, PointCut, JoinPoint 에 대한 객체 구현
 - [x] Target, Advisor, Advice, PointCut, JoinPoint 에 대한 단위 테스트 구현
-- [] FactoryBean을 Bean으로 등록하는 과정 대신에, @Transactional 어노테이션을 붙여서 자동화 하는 방법은 무엇일까요?
 
+
+## 3단계 요구사항 
+
+- [x] 트랜잭션 처리를 하고싶은 메서드에 @Transactional을 추가하면 트랜잭션 처리가 된다.
+- [x] UserService인터페이스 삭제, AppUserService 클래스를 UserService로 이름 변경
+- [x] TxUserService 클래스의 트랜잭션 처리 로직을 cglib 프록시로 옮기고, TxUserService를 삭제
+- [x] FactoryBean으로 프록시를 생성한다. (메서드 레벨, 클래스 레벨 애노테이션을 설정한다.)
+- [x] 모듈간 서로 의존하는 구조가 되므로, 트랜잭션 처리로직은 tx 모듈로 분리한다.
+
+
+
+
+- TransactionalPointcut
+  - 기능
+    - @Transactional 애노테이션이 붙여진 method나 class가 있다면 해당 조건에 조건을 return 합니다.
+- TransactionalAdvisor
+  - TransactionalAdvice와 TransactionalPointcut을 가지고 있습니다.
+- TransactionalAdvice
+  - Advice는 트랜잭션 commit 과 exception에 대한 롤백핸들링을 합니다.
+- TransactionalPostBeanProcessor
+  - @Transactional으로 decorated된 클래스와, 메서드에 속한 클래스를 proxy로 생성합니다.   
+  - Scanner를 통해 PostBeanProcessor를 읽어와서 2단계 피드백의 대한 요구조건을 만족시킵니다.
+  - [] FactoryBean을 Bean으로 등록하는 과정 대신에, @Transactional 어노테이션을 붙여서 자동화 하는 방법은 무엇일까요?
+    - PostBeanProcessor을 스캔해서 읽어와서 @Transactional이 달린 클래스들에 대해 proxy bean으로 등록합니다.
 
 
