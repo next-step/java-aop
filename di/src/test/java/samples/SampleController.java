@@ -8,8 +8,16 @@ public class SampleController {
 
   private SampleService sampleService;
 
+  public SampleService getSampleService() {
+    return sampleService;
+  }
+
   @Autowired
   public SampleController(final SampleService sampleService) {
     this.sampleService = sampleService;
+  }
+
+  public void hello() {
+    sampleService.hello();
   }
 }

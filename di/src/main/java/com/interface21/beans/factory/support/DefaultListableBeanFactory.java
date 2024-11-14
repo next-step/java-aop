@@ -1,10 +1,14 @@
 package com.interface21.beans.factory.support;
 
+import com.interface21.beans.BeanProxyInterceptor;
 import com.interface21.beans.BeanUtils;
+import com.interface21.beans.DefaultFactoryBean;
 import com.interface21.beans.factory.ConfigurableListableBeanFactory;
+import com.interface21.beans.factory.FactoryBean;
 import com.interface21.beans.factory.config.BeanDefinition;
 import com.interface21.context.annotation.AnnotatedBeanDefinition;
 import jakarta.annotation.PostConstruct;
+import net.sf.cglib.proxy.MethodInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,7 +93,7 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
             if (bean == null) {
                 throw new NullPointerException(param + "에 해당하는 Bean이 존재하지 않습니다.");
             }
-            args.add(getBean(param));
+            args.add(getFactoryBean(getBean(param), param));
         }
         return args.toArray();
     }
@@ -117,11 +121,39 @@ public class DefaultListableBeanFactory implements BeanDefinitionRegistry, Confi
         log.debug("Inject Bean : {}, Field : {}", bean, field);
         try {
             field.setAccessible(true);
-            field.set(bean, getBean(field.getType()));
-        } catch (IllegalAccessException | IllegalArgumentException e) {
+            injectFactoryBean(bean, field);
+        } catch (IllegalArgumentException e) {
             log.error(e.getMessage());
         }
     }
+
+    private void injectFactoryBean(Object bean, Field field) {
+        try {
+            Object targetBean = getBean(field.getType());
+            field.set(bean, getFactoryBean(targetBean, field.getType()));
+        } catch (IllegalAccessException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    private Object getFactoryBean(Object targetBean, Class<?> type) {
+        MethodInterceptor interceptor = new BeanProxyInterceptor(
+                type,
+                this,
+                targetBean
+
+        );
+        try {
+            return new DefaultFactoryBean(
+                    type,
+                    interceptor
+            ).getObject();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
+    }
+
 
     private Object injectConstructor(BeanDefinition beanDefinition) {
         Constructor<?> constructor = beanDefinition.getInjectConstructor();
